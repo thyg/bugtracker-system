@@ -22,7 +22,7 @@ jobs:
         java-version: '17'
 
     - name: 📦 Build avec Maven
-      run: mvn -B package --file service-ingestion/pom.xml
-
+      run: mvn -B package --file service-ingestion/service-ingestion/pom.xml
+     
     - name: ✅ Lancer les tests
-      run: mvn test --file service-ingestion/pom.xml
+      run: mvn test --file service-ingestion/service-ingestion/pom.xml
