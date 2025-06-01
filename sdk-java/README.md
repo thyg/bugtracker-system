@@ -1,0 +1,1 @@
+ # SDK pour envoyer les erreurs
