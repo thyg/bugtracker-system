@@ -1,0 +1,94 @@
+version: "3.8"
+
+services:
+  # -------------  Événements  -------------
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1           # garde la même version que Kafka
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports: ["2181:2181"]                             # accès si tu veux un UI Kafka plus tard
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    depends_on: [zookeeper]
+    ports: ["9092:9092"]                             # broker accessible en local
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  # -------------  Base relationnelle -------------
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: bugtracker
+      POSTGRES_PASSWORD: bug123
+      POSTGRES_DB: bugdb
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  # -------------  Base NoSQL (option) -------------
+  scylla:
+    image: scylladb/scylla:5.4
+    ports: ["9042:9042"]                              # driver Cassandra
+    volumes:
+      - scydata:/var/lib/scylla
+    # tu pourras commenter tout le bloc si tu ne l’utilises pas encore
+
+  # -------------  OneID / Hydra -------------
+  hydra-migrate:                                     # première exécution : crée le schéma
+    image: oryd/hydra:v1.11.8
+    command: migrate sql --yes ${DSN:-memory}
+    environment:
+      - DSN=memory
+
+  oneid:                                             # le vrai serveur OAuth2
+    image: oryd/hydra:v1.11.8
+    depends_on: [hydra-migrate]
+    ports:
+      - "4444:4444"      # public
+      - "4445:4445"      # admin
+    environment:
+      - DSN=memory
+      - URLS_SELF_ISSUER=http://localhost:4444
+      - URLS_LOGIN=http://localhost:8080/login
+      - URLS_CONSENT=http://localhost:8080/consent
+      - URLS_LOGOUT=http://localhost:8080/logout
+
+  # -------------  Micro-services (placeholders) -------------
+  ingestion:
+    build:
+      context: ./service-ingestion        # tu mettras ton code ici plus tard
+      dockerfile: Dockerfile              # laisser vide au début => Compose ignorera
+    depends_on: [kafka]
+    ports: ["8081:8081"]
+
+  traitement:
+    build:
+      context: ./service-traitement
+    depends_on: [kafka, postgres]
+    ports: ["8082:8082"]
+
+ 
+  # -------------  Passerelle API / proxy -------------
+  gateway:
+    image: nginx:alpine
+    depends_on: [traitement]
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports: ["8080:80"]
+
+  # -------------  Frontend placeholder -------------
+  frontend:
+    image: nginx:alpine
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html:ro     # quand il existera
+    ports: ["3000:80"]
+    depends_on: [gateway]
+
+volumes:
+  pgdata:
+  scydata:
