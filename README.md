@@ -200,26 +200,6 @@ bugtracker-system/
 | GET     | /api/issues  | 🚧 À faire    |
 
 
-### Exemple d'utilisation
-
-```bash
-# Envoyer une erreur
-curl -X POST http://localhost:8080/api/errors \
-  -H "Content-Type: application/json" \
-  -d '{
-    "message": "NullPointerException in UserService",
-    "stackTrace": "java.lang.NullPointerException: Cannot invoke...",
-    "level": "ERROR",
-    "timestamp": "2025-06-03T10:30:00Z",
-    "tags": {
-      "environment": "production",
-      "service": "user-service"
-    }
-  }'
-
-# Récupérer les issues
-curl http://localhost:8080/api/issues
-```
 
 ---
 
