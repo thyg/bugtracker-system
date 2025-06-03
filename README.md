@@ -124,8 +124,8 @@ docker system df
 ---
 
 ## 🗂️ Structure du projet
-'''
 
+```
 
 bugtracker-system/
 ├── 📄 docker-compose.yml         # Orchestration des services
