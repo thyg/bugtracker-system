@@ -1,4 +1,4 @@
-version: "3.8"
+# version: "3.8"
 
 services:
   # -------------  Événements  -------------
@@ -11,11 +11,14 @@ services:
   kafka:
     image: confluentinc/cp-kafka:7.6.1
     depends_on: [zookeeper]
-    ports: ["9092:9092"]                             # broker accessible en local
+    ports:
+      - "9092:9092"          # interne
+      - "19092:19092"        # accès depuis l’hôte
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:19092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:19092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
@@ -47,6 +50,7 @@ services:
 
   oneid:                                             # le vrai serveur OAuth2
     image: oryd/hydra:v1.11.8
+    command: serve all --dangerous-force-http  
     depends_on: [hydra-migrate]
     ports:
       - "4444:4444"      # public
@@ -57,6 +61,7 @@ services:
       - URLS_LOGIN=http://localhost:8080/login
       - URLS_CONSENT=http://localhost:8080/consent
       - URLS_LOGOUT=http://localhost:8080/logout
+      - DANGEROUS_FORCE_HTTP=true 
 
   # -------------  Micro-services (placeholders) -------------
   ingestion:
