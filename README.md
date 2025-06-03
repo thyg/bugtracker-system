@@ -166,7 +166,7 @@ bugtracker-system/
     │   ├── 📁 main/java/com/bugtracker/service_traitement/
     │   │   ├── 📁 controller/
     │   │   │   ├── 📄 TestController.java
-    │   │   │   └── 📄 ServiceTraitementApplication.java
+    │   │   │   
     │   │   └── 📄 ServiceTraitementApplication.java
     │   └── 📁 resources/
     │       ├── 📁 static/
