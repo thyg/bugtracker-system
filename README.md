@@ -124,29 +124,62 @@ docker system df
 ---
 
 ## 🗂️ Structure du projet
+'''
 
-```
+
 bugtracker-system/
 ├── 📄 docker-compose.yml         # Orchestration des services
 ├── 📄 nginx.conf                 # Configuration du gateway
-├── 📄 .env.example              # Variables d'environnement
-├── 📁 service-ingestion/        # 📥 Micro-service d'ingestion
-│   ├── 🐳 Dockerfile
-│   ├── 📄 pom.xml
-│   └── 📁 src/main/java/...
-├── 📁 service-traitement/       # ⚙️ Micro-service de traitement
-│   ├── 🐳 Dockerfile
-│   ├── 📄 pom.xml
-│   └── 📁 src/main/java/...
-├── 📁 frontend/                 # 🎨 Interface utilisateur
-│   ├── 📄 package.json
-│   └── 📁 src/...
-├── 📁 scripts/                  # 🔧 Scripts utilitaires
-│   ├── 📄 setup.sh
-│   └── 📄 cleanup.sh
-├── 📁 .github/workflows/        # 🤖 CI/CD GitHub Actions
+├── 📄 README.md                  # Documentation principale
+├── 📄 .gitignore                 # Fichiers à ignorer par Git
+├── 📁 .github/workflows/         # 🤖 CI/CD GitHub Actions
 │   └── 📄 ci.yml
-└── 📄 README.md                 # 📖 Documentation
+├── 📁 docs/                      # 📚 Documentation
+│   └── 📄 README.md
+├── 📁 frontend/                  # 🎨 Interface utilisateur (placeholder)
+│   ├── 📁 dist/
+│   └── 📄 README.md
+├── 📁 sdk-java/                  # ☕ SDK Java pour clients
+│   ├── 📁 src/
+│   ├── 📁 target/
+│   ├── 🐳 Dockerfile
+│   ├── 📄 HELP.md
+│   ├── 📁 mvnw & mvnw.cmd       # Maven Wrapper
+│   └── 📄 pom.xml
+├── 📁 service-ingestion/         # 📥 Micro-service d'ingestion
+│   ├── 📁 src/
+│   │   ├── 📁 main/java/com/bugtracker/service_ingestion/
+│   │   │   └── 📄 ServiceIngestionApplication.java
+│   │   └── 📁 resources/
+│   │       ├── 📁 static/
+│   │       ├── 📁 templates/
+│   │       └── 📄 application.properties
+│   ├── 📁 test/
+│   ├── 📁 target/
+│   ├── 🐳 Dockerfile
+│   ├── 📄 HELP.md
+│   ├── 📁 mvnw & mvnw.cmd       # Maven Wrapper
+│   ├── 📄 pom.xml
+│   └── 📄 README.md
+└── 📁 service-traitement/        # ⚙️ Micro-service de traitement
+    ├── 📁 src/
+    │   ├── 📁 main/java/com/bugtracker/service_traitement/
+    │   │   ├── 📁 controller/
+    │   │   │   ├── 📄 TestController.java
+    │   │   │   └── 📄 ServiceTraitementApplication.java
+    │   │   └── 📄 ServiceTraitementApplication.java
+    │   └── 📁 resources/
+    │       ├── 📁 static/
+    │       ├── 📁 templates/
+    │       └── 📄 application.properties
+    ├── 📁 test/
+    ├── 📁 target/
+    ├── 🐳 Dockerfile
+    ├── 📄 HELP.md
+    ├── 📁 mvnw & mvnw.cmd          # Maven Wrapper
+    ├── 📄 pom.xml
+    └── 📄 README.md```
+
 ```
 
 ---
