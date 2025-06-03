@@ -91,9 +91,9 @@ curl http://localhost:8082/actuator/health  # Service Traitement
 ### Accès aux interfaces
 
 - **🌐 API Gateway** : http://localhost:8080
-- **📊 Kafka UI** : http://localhost:19092 (si configuré)
+- **📊 Port externe du broker Kafka** : http://localhost:19092 (si configuré)
 - **🎨 Frontend** : http://localhost:3000
-- **🔐 OneID Admin** : http://localhost:4445
+- **🔐 API Admin Ory Hydra (JSON / REST, pas d’interface graphique).** : http://localhost:4445
 
 ---
 
@@ -189,19 +189,16 @@ bugtracker-system/
 ### API Principales
 
 | Méthode | Endpoint | Service | Description |
-|---------|----------|---------|-------------|
-| `POST` | `/api/errors` | Ingestion | 📥 Réception des erreurs depuis les SDK |
-| `GET` | `/api/issues` | Traitement | 📋 Liste des issues agrégées |
-| `GET` | `/api/issues/{id}` | Traitement | 🔍 Détail d'une issue |
-| `POST` | `/api/issues/{id}/resolve` | Traitement | ✅ Marquer comme résolue |
+
 
 ### Endpoints de monitoring
 
 | Méthode | Endpoint | Description |
 |---------|----------|-------------|
 | `GET` | `/api/test` | 🏥 Test de connectivité |
-| `GET` | `/actuator/health` | 💚 Health check Spring Boot |
-| `GET` | `/actuator/metrics` | 📊 Métriques de performance |
+| POST    | /api/errors  | 🚧 À faire    |
+| GET     | /api/issues  | 🚧 À faire    |
+
 
 ### Exemple d'utilisation
 
@@ -230,7 +227,7 @@ curl http://localhost:8080/api/issues
 
 ### Variables d'environnement principales
 
-Copiez `.env.example` vers `.env` et adaptez selon vos besoins :
+
 
 ```bash
 # Base de données PostgreSQL
