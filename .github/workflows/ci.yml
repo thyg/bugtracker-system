@@ -8,21 +8,30 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
+    # 1) Récupère le code
     - name: 📥 Cloner le code
       uses: actions/checkout@v3
 
+    # 2) Installe Java 17
     - name: 🔧 Installer Java
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: 📦 Build avec Maven
-      run: mvn -B package --file service-ingestion/service-ingestion/pom.xml
-     
-    - name: ✅ Lancer les tests
-      run: mvn test --file service-ingestion/service-ingestion/pom.xml -Dspring.profiles.active=test
+    # 3) Compile le micro-service ingestion
+    - name: 📦 Build service-ingestion
+      run: mvn -B package --file service-ingestion/pom.xml
+
+    # 4) Exécute les tests unitaires
+    - name: ✅ Tests service-ingestion
+      run: mvn test --file service-ingestion/pom.xml -Dspring.profiles.active=test
+
+    - name: 📦 Build service-traitement
+      run: mvn -B package --file service-traitement/pom.xml
+
+    - name: ✅ Tests service-traitement
+      run: mvn test --file service-traitement/pom.xml -Dspring.profiles.active=test
