@@ -1,0 +1,7 @@
+com/bugtracker/sdk/FinalTest.class
+com/bugtracker/sdk/BugTrackerClient.class
+com/bugtracker/sdk/App.class
+com/bugtracker/sdk/SimpleTest.class
+com/bugtracker/sdk/BugTrackerTransport.class
+com/bugtracker/sdk/BugTrackerSDK.class
+com/bugtracker/sdk/SentryApiDebug.class
