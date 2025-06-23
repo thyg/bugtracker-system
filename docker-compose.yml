@@ -1,19 +1,25 @@
-# version: "3.8"
+# ========================================================
+# DOCKER-COMPOSE ÉVOLUTIF - BASÉ SUR VOTRE EXISTANT
+# ========================================================
+
+#version: "3.8"
 
 services:
-  # -------------  Événements  -------------
+  # ============== ÉVÉNEMENTS (INCHANGÉ) ==============
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.6.1           # garde la même version que Kafka
+    image: confluentinc/cp-zookeeper:7.6.1
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
-    ports: ["2181:2181"]                             # accès si tu veux un UI Kafka plus tard
+    ports: ["2181:2181"]
+    networks:
+      - bugtracker_network
 
   kafka:
     image: confluentinc/cp-kafka:7.6.1
     depends_on: [zookeeper]
     ports:
-      - "9092:9092"          # interne
-      - "19092:19092"        # accès depuis l’hôte
+      - "9092:9092"
+      - "19092:19092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -21,79 +27,328 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:19092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - bugtracker_network
 
-  # -------------  Base relationnelle -------------
+  # ============== BASE DE DONNÉES (ÉVOLUTIVE) ==============
   postgres:
     image: postgres:15
     environment:
-      POSTGRES_USER: bugtracker
-      POSTGRES_PASSWORD: bug123
-      POSTGRES_DB: bugdb
-    ports: ["5432:5432"]
+      POSTGRES_USER: ${DB_USER:-bugtracker}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-bug123}
+      POSTGRES_DB: ${DB_NAME:-bugdb}
+      # 🆕 Configuration pour différents environnements
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.utf8"
+    ports: 
+      - "${DB_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      # 🆕 Scripts d'initialisation optionnels
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - bugtracker_network
+    # 🆕 Health check
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-bugtracker}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  # -------------  Base NoSQL (option) -------------
+  # ============== BASE NoSQL (OPTIONNELLE) ==============
   scylla:
     image: scylladb/scylla:5.4
-    ports: ["9042:9042"]                              # driver Cassandra
+    ports: 
+      - "${SCYLLA_PORT:-9042}:9042"
     volumes:
       - scydata:/var/lib/scylla
-    # tu pourras commenter tout le bloc si tu ne l’utilises pas encore
+    networks:
+      - bugtracker_network
+    profiles:
+      - full  # 🆕 Activé seulement avec --profile full
 
-  # -------------  OneID / Hydra -------------
-  hydra-migrate:                                     # première exécution : crée le schéma
+  # ============== ONEID / OAUTH2 (AMÉLIORÉ) ==============
+  hydra-migrate:
     image: oryd/hydra:v1.11.8
-    command: migrate sql --yes ${DSN:-memory}
+    command: migrate sql --yes ${HYDRA_DSN:-memory}
     environment:
-      - DSN=memory
+      - DSN=${HYDRA_DSN:-memory}
+    networks:
+      - bugtracker_network
 
-  oneid:                                             # le vrai serveur OAuth2
+  oneid:
     image: oryd/hydra:v1.11.8
-    command: serve all --dangerous-force-http  
+    command: serve all ${HYDRA_FORCE_HTTP:-}
     depends_on: [hydra-migrate]
     ports:
-      - "4444:4444"      # public
-      - "4445:4445"      # admin
+      - "${ONEID_PUBLIC_PORT:-4444}:4444"
+      - "${ONEID_ADMIN_PORT:-4445}:4445"
     environment:
-      - DSN=memory
-      - URLS_SELF_ISSUER=http://localhost:4444
-      - URLS_LOGIN=http://localhost:8080/login
-      - URLS_CONSENT=http://localhost:8080/consent
-      - URLS_LOGOUT=http://localhost:8080/logout
-      - DANGEROUS_FORCE_HTTP=true 
+      - DSN=${HYDRA_DSN:-memory}
+      - URLS_SELF_ISSUER=${ONEID_ISSUER:-http://localhost:4444}
+      - URLS_LOGIN=${ONEID_LOGIN_URL:-http://localhost:8080/login}
+      - URLS_CONSENT=${ONEID_CONSENT_URL:-http://localhost:8080/consent}
+      - URLS_LOGOUT=${ONEID_LOGOUT_URL:-http://localhost:8080/logout}
+      # 🆕 Configuration par environnement
+      - DANGEROUS_FORCE_HTTP=${HYDRA_FORCE_HTTP:-true}
+      - LOG_LEVEL=${ONEID_LOG_LEVEL:-info}
+    networks:
+      - bugtracker_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4444/health/ready"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  # -------------  Micro-services (placeholders) -------------
+  # ============== SERVICE D'INGESTION (ÉVOLUTIF) ==============
   ingestion:
     build:
-      context: ./service-ingestion        # tu mettras ton code ici plus tard
-      dockerfile: Dockerfile              # laisser vide au début => Compose ignorera
-    depends_on: [kafka]
-    ports: ["8081:8081"]
+      context: ./service-ingestion
+      dockerfile: Dockerfile
+      # 🆕 Args de build pour différents environnements
+      args:
+        - BUILD_ENV=${BUILD_ENVIRONMENT:-development}
+    depends_on:
+      kafka:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    ports: 
+      - "${INGESTION_PORT:-8081}:8081"
+     
+    environment:
+      # 🆕 Configuration complète pour l'agent hybride
+      
+      # Base de données
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/${DB_NAME:-bugdb}
+      - DATABASE_USERNAME=${DB_USER:-bugtracker}
+      - DATABASE_PASSWORD=${DB_PASSWORD:-bug123}
+      
+      # Cache Redis
+      - REDIS_URL=redis://redis:6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      
+      # Kafka
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - KAFKA_TOPIC_ERRORS=${KAFKA_TOPIC_ERRORS:-bugtracker-errors}
+      
+      # Sécurité et Auth
+      - SSL_ENABLED=${SSL_ENABLED:-false}
+      - AUTH_ENABLED=${AUTH_ENABLED:-false}
+      - ONEID_URL=${ONEID_ISSUER:-http://oneid:4444}
+      - API_KEY_VALIDATION=${API_KEY_VALIDATION:-false}
+      
+      # CORS (important pour l'agent)
+      - CORS_ORIGINS=${CORS_ORIGINS:-*}
+      - CORS_METHODS=${CORS_METHODS:-GET,POST,PUT,DELETE,OPTIONS}
+      
+      # Rate Limiting  
+      - RATE_LIMIT_ENABLED=${RATE_LIMIT_ENABLED:-false}
+      - RATE_LIMIT_PER_IP=${RATE_LIMIT_PER_IP:-1000}
+      - RATE_LIMIT_PER_CLIENT=${RATE_LIMIT_PER_CLIENT:-10000}
+      
+      # Environment et Logging
+      - APP_ENVIRONMENT=${APP_ENVIRONMENT:-development}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - LOG_FORMAT=${LOG_FORMAT:-json}
+      
+      # Monitoring interne
+      - METRICS_ENABLED=${METRICS_ENABLED:-true}
+      - HEALTH_CHECK_ENABLED=${HEALTH_CHECK_ENABLED:-true}
+      - PROMETHEUS_METRICS=${PROMETHEUS_METRICS:-false}
+      
+      # 🆕 Spécifique à l'Agent Hybride
+      - AGENT_SUPPORT_ENABLED=true
+      - SENTRY_DATA_ENRICHMENT=true
+      - BREADCRUMBS_SUPPORT=true
+      - PERFORMANCE_TRACKING=true
+      
+      # Retention et Storage
+      - DATA_RETENTION_DAYS=${DATA_RETENTION_DAYS:-30}
+      - MAX_PAYLOAD_SIZE=${MAX_PAYLOAD_SIZE:-1MB}
+      
+    volumes:
+      # 🆕 Logs persistants
+      - ingestion_logs:/app/logs
+      # 🆕 Configuration optionnelle
+      - ./config/ingestion:/app/config:ro
+    networks:
+      - bugtracker_network
+    # 🆕 Health check CORRIGÉ
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
+  # ============== SERVICE DE TRAITEMENT (INCHANGÉ MAIS AMÉLIORÉ) ==============
   traitement:
     build:
       context: ./service-traitement
-    depends_on: [kafka, postgres]
-    ports: ["8082:8082"]
+      dockerfile: Dockerfile
+    depends_on:
+      kafka:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+      ingestion:
+        condition: service_healthy
+    ports: 
+      - "${TRAITEMENT_PORT:-8082}:8082"
+    environment:
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/${DB_NAME:-bugdb}
+      - DATABASE_USERNAME=${DB_USER:-bugtracker}
+      - DATABASE_PASSWORD=${DB_PASSWORD:-bug123}
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - APP_ENVIRONMENT=${APP_ENVIRONMENT:-development}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    networks:
+      - bugtracker_network
 
- 
-  # -------------  Passerelle API / proxy -------------
+  # ============== GATEWAY / PROXY (ÉVOLUTIF) ==============
   gateway:
     image: nginx:alpine
-    depends_on: [traitement]
+    depends_on:
+      ingestion:
+        condition: service_healthy
+      traitement:
+        condition: service_started
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    ports: ["8080:80"]
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      # 🆕 Configuration SSL conditionnelle
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      # 🆕 Templates de configuration
+      - ./nginx/templates:/etc/nginx/templates:ro
+    ports: 
+      - "${GATEWAY_HTTP_PORT:-8080}:80"
+      - "${GATEWAY_HTTPS_PORT:-8443}:443"
+    environment:
+      # 🆕 Variables pour les templates Nginx
+      - INGESTION_UPSTREAM=ingestion:8081
+      - TRAITEMENT_UPSTREAM=traitement:8082
+      - FRONTEND_UPSTREAM=frontend:80
+      - SSL_ENABLED=${SSL_ENABLED:-false}
+    networks:
+      - bugtracker_network
 
-  # -------------  Frontend placeholder -------------
+  # ============== FRONTEND (ÉVOLUTIF) ==============
   frontend:
-    image: nginx:alpine
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=${REACT_APP_API_URL:-http://localhost:8080}
+        - REACT_APP_ENVIRONMENT=${APP_ENVIRONMENT:-development}
+        - REACT_APP_AUTH_ENABLED=${AUTH_ENABLED:-false}
+        - REACT_APP_ONEID_URL=${ONEID_ISSUER:-http://localhost:4444}
+    depends_on:
+      gateway:
+        condition: service_started
+    ports: 
+      - "${FRONTEND_PORT:-3000}:80"
+    environment:
+      # 🆕 Configuration runtime
+      - API_URL=${REACT_APP_API_URL:-http://localhost:8080}
+      - ENVIRONMENT=${APP_ENVIRONMENT:-development}
     volumes:
-      - ./frontend/dist:/usr/share/nginx/html:ro     # quand il existera
-    ports: ["3000:80"]
-    depends_on: [gateway]
+      # 🆕 Configuration Nginx du frontend
+      - ./frontend/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - bugtracker_network
 
+  # ============== MONITORING (NOUVEAU - OPTIONNEL) ==============
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - bugtracker_network
+    profiles:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "${GRAFANA_PORT:-3001}:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana:/etc/grafana/provisioning:ro
+    networks:
+      - bugtracker_network
+    profiles:
+      - monitoring
+
+  # ============== AGENT JAVA (NOUVEAU) ==============
+  agent-builder:
+    build:
+      context: ./agent-java
+      dockerfile: Dockerfile
+    volumes:
+      # Volume partagé pour distribuer l'agent
+      - agent_jar:/app/agent
+    networks:
+      - bugtracker_network
+    profiles:
+      - agent  # Activé avec --profile agent
+
+  # ============== APPLICATION DE TEST AVEC AGENT ==============
+  test-app-with-agent:
+    image: eclipse-temurin:11-jre-alpine
+    depends_on:
+      agent-builder:
+        condition: service_completed_successfully
+      ingestion:
+        condition: service_healthy
+    volumes:
+      # Monter l'agent depuis le builder
+      - agent_jar:/app/agent:ro
+      # Monter une application de test
+      - ./examples/test-app.jar:/app/test-app.jar:ro
+    environment:
+      - BUGTRACKER_ENDPOINT=http://ingestion:8081/api/errors
+      - BUGTRACKER_DEBUG=true
+    command: >
+      sh -c "
+        echo '🧪 Démarrage application de test avec BugTracker Agent...' &&
+        java -javaagent:/app/agent/bugtracker-agent.jar 
+             -Dbugtracker.endpoint=http://ingestion:8081/api/errors
+             -jar /app/test-app.jar
+      "
+    networks:
+      - bugtracker_network
+    profiles:
+      - agent-test
+
+# ========================================================
+# VOLUMES
+# ========================================================
 volumes:
   pgdata:
+    driver: local
   scydata:
+    driver: local
+  redis_data:
+    driver: local
+  ingestion_logs:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  agent_jar:
+    driver: local
+
+# ========================================================
+# NETWORKS
+# ========================================================
+networks:
+  bugtracker_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
