@@ -1,0 +1,5 @@
+/home/jude/Documents/Bug tracker/bugtracker-system/service-ingestion/src/main/java/com/bugtracker/service_ingestion/ServiceIngestionApplication.java
+/home/jude/Documents/Bug tracker/bugtracker-system/service-ingestion/src/main/java/com/bugtracker/service_ingestion/config/KafkaProducerConfig.java
+/home/jude/Documents/Bug tracker/bugtracker-system/service-ingestion/src/main/java/com/bugtracker/service_ingestion/controller/ErrorIngestionController.java
+/home/jude/Documents/Bug tracker/bugtracker-system/service-ingestion/src/main/java/com/bugtracker/service_ingestion/model/ErrorEventDTO.java
+/home/jude/Documents/Bug tracker/bugtracker-system/service-ingestion/src/main/java/com/bugtracker/service_ingestion/service/ErrorPublishService.java

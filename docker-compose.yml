@@ -34,9 +34,12 @@ services:
   postgres:
     image: postgres:15
     environment:
-      POSTGRES_USER: ${DB_USER:-bugtracker}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-bug123}
-      POSTGRES_DB: ${DB_NAME:-bugdb}
+      #POSTGRES_USER: ${DB_USER:-bugtracker}
+      #POSTGRES_PASSWORD: ${DB_PASSWORD:-bug123}
+      #POSTGRES_DB: ${DB_NAME:-bugdb}
+      POSTGRES_USER: bugtracker
+      POSTGRES_PASSWORD: bug123
+      POSTGRES_DB: bugdb
       # 🆕 Configuration pour différents environnements
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.utf8"
     ports: 
@@ -49,10 +52,11 @@ services:
       - bugtracker_network
     # 🆕 Health check
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-bugtracker}"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      test: ["CMD-SHELL", "pg_isready -U bugtracker -d bugdb"]
+     # test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-bugtracker}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # ============== BASE NoSQL (OPTIONNELLE) ==============
   scylla:
@@ -119,9 +123,9 @@ services:
       # 🆕 Configuration complète pour l'agent hybride
       
       # Base de données
-      - DATABASE_URL=jdbc:postgresql://postgres:5432/${DB_NAME:-bugdb}
-      - DATABASE_USERNAME=${DB_USER:-bugtracker}
-      - DATABASE_PASSWORD=${DB_PASSWORD:-bug123}
+      #- DATABASE_URL=jdbc:postgresql://postgres:5432/${DB_NAME:-bugdb}
+      #- DATABASE_USERNAME=${DB_USER:-bugtracker}
+      #- DATABASE_PASSWORD=${DB_PASSWORD:-bug123}
       
       # Cache Redis
       - REDIS_URL=redis://redis:6379
@@ -175,7 +179,7 @@ services:
       - bugtracker_network
     # 🆕 Health check CORRIGÉ
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/api/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/api/errors/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -196,12 +200,15 @@ services:
     ports: 
       - "${TRAITEMENT_PORT:-8082}:8082"
     environment:
-      - DATABASE_URL=jdbc:postgresql://postgres:5432/${DB_NAME:-bugdb}
-      - DATABASE_USERNAME=${DB_USER:-bugtracker}
-      - DATABASE_PASSWORD=${DB_PASSWORD:-bug123}
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - APP_ENVIRONMENT=${APP_ENVIRONMENT:-development}
-      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      #- DATABASE_URL=jdbc:postgresql://postgres:5432/${DB_NAME:-bugdb}
+      #- DATABASE_USERNAME=${DB_USER:-bugtracker}
+      #- DATABASE_PASSWORD=${DB_PASSWORD:-bug123}
+        - DATABASE_URL=jdbc:postgresql://postgres:5432/bugdb
+        - DATABASE_USERNAME=bugtracker
+        - DATABASE_PASSWORD=bug123
+        - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+        - APP_ENVIRONMENT=${APP_ENVIRONMENT:-development}
+        - LOG_LEVEL=${LOG_LEVEL:-INFO}
     networks:
       - bugtracker_network
 
@@ -220,7 +227,7 @@ services:
       # 🆕 Templates de configuration
       - ./nginx/templates:/etc/nginx/templates:ro
     ports: 
-      - "${GATEWAY_HTTP_PORT:-8080}:80"
+      - "8088:80"
       - "${GATEWAY_HTTPS_PORT:-8443}:443"
     environment:
       # 🆕 Variables pour les templates Nginx
@@ -284,41 +291,37 @@ services:
       - monitoring
 
   # ============== AGENT JAVA (NOUVEAU) ==============
-  agent-builder:
-    build:
-      context: ./agent-java
-      dockerfile: Dockerfile
-    volumes:
+  #agent-builder:
+   # build:
+    #  context: ./agent-java
+     # dockerfile: Dockerfile
+    #volumes:
       # Volume partagé pour distribuer l'agent
-      - agent_jar:/app/agent
-    networks:
-      - bugtracker_network
-    profiles:
-      - agent  # Activé avec --profile agent
+     # - agent_jar:/app/agent
+    #networks:
+     # - bugtracker_network
+    #profiles:
+     # - agent  # Activé avec --profile agent
 
   # ============== APPLICATION DE TEST AVEC AGENT ==============
   test-app-with-agent:
-    image: eclipse-temurin:11-jre-alpine
+    image: eclipse-temurin:17-jre-alpine
     depends_on:
-      agent-builder:
-        condition: service_completed_successfully
+     # agent-builder:
+        #condition: service_completed_successfully
       ingestion:
         condition: service_healthy
     volumes:
       # Monter l'agent depuis le builder
-      - agent_jar:/app/agent:ro
+      #- agent_jar:/app/agent:ro
+      # Monte l'agent directement depuis votre dossier target
+      - ./agent-java/target/bugtracker-agent-1.0.0-SNAPSHOT-agent.jar:/app/agent/bugtracker-agent.jar:ro
       # Monter une application de test
       - ./examples/test-app.jar:/app/test-app.jar:ro
     environment:
       - BUGTRACKER_ENDPOINT=http://ingestion:8081/api/errors
       - BUGTRACKER_DEBUG=true
-    command: >
-      sh -c "
-        echo '🧪 Démarrage application de test avec BugTracker Agent...' &&
-        java -javaagent:/app/agent/bugtracker-agent.jar 
-             -Dbugtracker.endpoint=http://ingestion:8081/api/errors
-             -jar /app/test-app.jar
-      "
+    command: java -javaagent:/app/agent/bugtracker-agent.jar -Dbugtracker.debug=true -Dbugtracker.projectKey=PROJECT-DOCKER-TEST -jar /app/test-app.jar
     networks:
       - bugtracker_network
     profiles:
@@ -348,7 +351,4 @@ volumes:
 # ========================================================
 networks:
   bugtracker_network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
+     driver: bridge

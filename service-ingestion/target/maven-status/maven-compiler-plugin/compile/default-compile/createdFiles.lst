@@ -1,0 +1,5 @@
+com/bugtracker/service_ingestion/model/ErrorEventDTO.class
+com/bugtracker/service_ingestion/config/KafkaProducerConfig.class
+com/bugtracker/service_ingestion/service/ErrorPublishService.class
+com/bugtracker/service_ingestion/controller/ErrorIngestionController.class
+com/bugtracker/service_ingestion/ServiceIngestionApplication.class
