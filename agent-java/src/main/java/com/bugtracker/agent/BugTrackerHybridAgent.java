@@ -1,302 +1,290 @@
 package com.bugtracker.agent;
 
-import io.sentry.*;
+import io.sentry.Breadcrumb;
+import io.sentry.Sentry;
+import io.sentry.SentryEvent;
+import io.sentry.protocol.Device;
+import io.sentry.protocol.OperatingSystem;
 import io.sentry.protocol.SentryException;
-import io.sentry.protocol.SentryTransaction;
+import io.sentry.protocol.SentryRuntime;
+import io.sentry.protocol.SentryStackFrame;
+import io.sentry.protocol.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * BugTracker Hybrid Agent - Version corrigée pour capturer automatiquement
+ * BugTracker Hybrid Agent - Java Agent utilisant Sentry SDK v8.x
+ * Capture automatiquement les erreurs et enrichit l'événement
  */
 public class BugTrackerHybridAgent {
-    
     private static final String DEFAULT_ENDPOINT = "http://localhost:8081/api/errors";
     private static String bugTrackerEndpoint;
     private static boolean debugMode = false;
+    private static String projectKey;
     private static CloseableHttpClient httpClient;
     private static ObjectMapper objectMapper;
-    
-    /**
-     * Point d'entrée pour java -javaagent
-     */
+
     public static void premain(String agentArgs, Instrumentation inst) {
         System.out.println("🚀 BugTracker Agent v1.0.0 - Démarrage...");
-        
-        // Parse des arguments
         parseAgentArguments(agentArgs);
-        
-        // Initialisation
         initializeComponents();
-        
-        // Configuration Sentry CORRIGÉE
         configureSentry();
-        
-        // Hook pour capturer les exceptions non gérées
         setupUncaughtExceptionHandler();
-        
-        System.out.println("✅ BugTracker Agent initialisé avec succès!");
-        System.out.println("📡 Endpoint: " + bugTrackerEndpoint);
-        System.out.println("🔍 Debug: " + debugMode);
+        System.out.println("✅ Agent initialisé! Endpoint: " + bugTrackerEndpoint + " | Debug: " + debugMode);
     }
-    
-    /**
-     * Parse les arguments de l'agent
-     */
+
     private static void parseAgentArguments(String agentArgs) {
-        bugTrackerEndpoint = System.getProperty("bugtracker.endpoint", 
-                            System.getenv("BUGTRACKER_ENDPOINT"));
-        
-        if (bugTrackerEndpoint == null && agentArgs != null && !agentArgs.trim().isEmpty()) {
+        bugTrackerEndpoint = System.getProperty("bugtracker.endpoint",
+                System.getenv("BUGTRACKER_ENDPOINT"));
+        if (bugTrackerEndpoint == null && agentArgs != null && !agentArgs.isEmpty()) {
             bugTrackerEndpoint = agentArgs.trim();
         }
-        
         if (bugTrackerEndpoint == null) {
             bugTrackerEndpoint = DEFAULT_ENDPOINT;
         }
-        
-        debugMode = "true".equalsIgnoreCase(
-                    System.getProperty("bugtracker.debug", 
-                    System.getenv("BUGTRACKER_DEBUG")));
+
+        // AJOUT : Lecture de la Clé de Projet avec une valeur par défaut
+    projectKey = System.getProperty("bugtracker.projectKey", System.getenv("BUGTRACKER_PROJECT_KEY"));
+
+    if (projectKey == null || projectKey.trim().isEmpty()) {
+        // La clé n'a PAS été fournie par l'utilisateur. On utilise une clé de développement.
+        projectKey = "dev-project-key-01"; // Votre clé de test constante
+        System.out.println("⚠️ AVERTISSEMENT: Aucune clé de projet (bugtracker.projectKey) n'a été fournie.");
+        System.out.println("   -> Utilisation de la clé de développement par défaut : '" + projectKey + "'");
+        System.out.println("   -> Pour une utilisation en production, veuillez fournir une clé de projet valide.");
+    } else {
+        // La clé a été fournie, on l'affiche pour confirmation (utile en mode debug)
+        System.out.println("✅ Clé de projet utilisée : '" + projectKey + "'");
     }
-    
-    /**
-     * Initialise les composants de base
-     */
+
+
+
+
+
+        debugMode = "true".equalsIgnoreCase(
+                System.getProperty("bugtracker.debug", System.getenv("BUGTRACKER_DEBUG")));
+    }
+
     private static void initializeComponents() {
         httpClient = HttpClients.createDefault();
-        
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        
-        // Ajouter shutdown hook
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+        java.lang.Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
-                if (httpClient != null) {
-                    httpClient.close();
-                }
+                if (httpClient != null) httpClient.close();
                 Sentry.close();
-                System.out.println("🛑 BugTracker Agent arrêté proprement");
+                System.out.println("🛑 Agent arrêté proprement");
             } catch (Exception e) {
-                System.err.println("❌ Erreur lors de l'arrêt de l'agent: " + e.getMessage());
+                System.err.println("❌ Erreur arrêt agent: " + e.getMessage());
             }
         }));
     }
-    
-    /**
-     * CORRECTION: Configure Sentry avec un DSN valide pour capturer les erreurs
-     */
+
     private static void configureSentry() {
-        try {
-            Sentry.init(options -> {
-                // CORRECTION: Utiliser un DSN bidon mais valide pour activer Sentry
-                options.setDsn("https://public@localhost/1");
-                
-                // Configurer l'environnement
-                options.setEnvironment("bugtracker-agent");
-                options.setRelease("1.0.0");
-                
-                // Activer la capture automatique
-                options.setAttachThreads(true);
-                options.setAttachStacktrace(true);
-                options.setEnableUncaughtExceptionHandler(true);
-                
-                // IMPORTANT: Désactiver l'envoi réel vers Sentry
-                options.setBeforeSend((event, hint) -> {
-                    // Traiter l'événement de façon asynchrone
-                    CompletableFuture.runAsync(() -> sendToBugTracker(event));
-                    
-                    // Retourner null pour empêcher l'envoi vers Sentry
-                    return null;
-                });
-                
-                if (debugMode) {
-                    options.setDebug(true);
-                    System.out.println("🔍 Sentry debug activé");
-                }
+        Sentry.init(options -> {
+            options.setDsn("https://public@localhost/1");
+            options.setEnvironment("bugtracker-agent");
+            options.setRelease("1.0.0");
+            options.setMaxBreadcrumbs(50);
+            options.setTracesSampleRate(1.0);
+            options.setAttachThreads(true);
+            options.setAttachStacktrace(true);
+            options.setEnableUncaughtExceptionHandler(true);
+            options.setBeforeSend((event, hint) -> {
+                CompletableFuture.runAsync(() -> sendToBugTracker(event));
+                return null;
             });
-            
-            // Configurer le scope global
-            Sentry.configureScope(scope -> {
-                scope.setTag("agent", "bugtracker-hybrid");
-                scope.setTag("version", "1.0.0");
-                scope.setExtra("endpoint", bugTrackerEndpoint);
-            });
-            
-        } catch (Exception e) {
-            System.err.println("❌ Erreur configuration Sentry: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-    
-    /**
-     * NOUVEAU: Hook pour capturer les exceptions non gérées du thread principal
-     */
-    private static void setupUncaughtExceptionHandler() {
-        Thread.setDefaultUncaughtExceptionHandler((thread, exception) -> {
             if (debugMode) {
-                System.out.println("🔥 Exception non gérée capturée: " + exception.getMessage());
-            }
-            
-            // Envoyer via Sentry (qui sera redirigé vers BugTracker)
-            Sentry.captureException(exception);
-            
-            // Attendre un peu pour que l'envoi se fasse
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                options.setDebug(true);
+                System.out.println("🔍 Sentry debug activé");
             }
         });
+        Sentry.configureScope(scope -> {
+            scope.setTag("agent", "bugtracker-hybrid");
+            scope.setTag("version", "1.0.0");
+            scope.setExtra("endpoint", bugTrackerEndpoint);
+        });
     }
-    
-    /**
-     * NOUVEAU: Méthode publique pour capturer manuellement les exceptions
-     */
+
+    private static void setupUncaughtExceptionHandler() {
+        Thread.setDefaultUncaughtExceptionHandler((thread, exception) -> {
+            if (debugMode) System.out.println("🔥 Exception capturée: " + exception.getMessage());
+            Sentry.captureException(exception);
+            try { Thread.sleep(500); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+        });
+    }
+
+    /** API pour capture manuelle */
     public static void captureException(Throwable throwable) {
-        if (debugMode) {
-            System.out.println("🎯 Capture manuelle d'exception: " + throwable.getMessage());
-        }
+        if (debugMode) System.out.println("🎯 Capture manuelle: " + throwable.getMessage());
         Sentry.captureException(throwable);
     }
-    
+
     /**
-     * Envoie l'événement vers BugTracker
+     * Envoie vers BugTracker en gérant les cas d'indisponibilité
      */
     private static void sendToBugTracker(SentryEvent event) {
         try {
-            // Convertir l'événement Sentry en format BugTracker
-            Map<String, Object> bugTrackerEvent = convertSentryEvent(event);
-            
-            // Sérialiser en JSON
-            String jsonPayload = objectMapper.writeValueAsString(bugTrackerEvent);
-            
-            if (debugMode) {
-                System.out.println("📤 Envoi vers BugTracker: " + jsonPayload);
-            }
-            
-            // Envoyer via HTTP
+            Map<String, Object> payload = convertSentryEvent(event);
+            String json = objectMapper.writeValueAsString(payload);
+            if (debugMode) System.out.println("📤 BugTracker payload: " + json);
             HttpPost post = new HttpPost(bugTrackerEndpoint);
-            post.setEntity(new StringEntity(jsonPayload, "UTF-8"));
+            post.setEntity(new StringEntity(json, "UTF-8"));
             post.setHeader("Content-Type", "application/json");
             post.setHeader("User-Agent", "BugTracker-Agent/1.0.0");
-            
-            try (CloseableHttpResponse response = httpClient.execute(post)) {
-                int statusCode = response.getStatusLine().getStatusCode();
-                
-                if (statusCode >= 200 && statusCode < 300) {
-                    if (debugMode) {
-                        System.out.println("✅ Erreur envoyée avec succès à BugTracker (HTTP " + statusCode + ")");
-                    }
-                } else {
-                    System.err.println("❌ Erreur HTTP " + statusCode + " lors de l'envoi vers BugTracker");
+            try (CloseableHttpResponse resp = httpClient.execute(post)) {
+                int code = resp.getStatusLine().getStatusCode();
+                if (code < 200 || code >= 300) {
+                    System.err.println("❌ HTTP " + code + " lors de l'envoi");
                 }
             }
-            
-        } catch (Exception e) {
-            System.err.println("❌ Erreur lors de l'envoi vers BugTracker: " + e.getMessage());
+        } catch (IOException ioe) {
             if (debugMode) {
-                e.printStackTrace();
+                System.err.println("⚠️ BugTracker inaccessible: " + ioe.getMessage());
             }
+        } catch (Exception e) {
+            System.err.println("❌ Erreur envoi BugTracker: " + e.getMessage());
+            if (debugMode) e.printStackTrace();
         }
     }
-    
-    /**
-     * Convertit un événement Sentry en format BugTracker
-     */
+
+    /** Conversion SentryEvent ➔ Map pour JSON */
     private static Map<String, Object> convertSentryEvent(SentryEvent event) {
-        Map<String, Object> bugTrackerEvent = new HashMap<>();
-        
-        // Informations de base
-        bugTrackerEvent.put("timestamp", Instant.now().toString());
-        bugTrackerEvent.put("level", event.getLevel() != null ? event.getLevel().toString() : "ERROR");
-        bugTrackerEvent.put("message", event.getMessage() != null ? event.getMessage().getFormatted() : "Unknown error");
-        bugTrackerEvent.put("platform", "java");
-        bugTrackerEvent.put("agent", "bugtracker-hybrid/1.0.0");
-        
-        // Exception principale
+        Map<String, Object> btEvent = new HashMap<>();
+        // champs de base
+        btEvent.put("projectKey", projectKey);
+        btEvent.put("timestamp", Instant.now().toString());
+        btEvent.put("level", event.getLevel() != null ? event.getLevel().toString() : "ERROR");
+        btEvent.put("message", event.getMessage() != null ? event.getMessage().getFormatted() : "Unknown");
+        btEvent.put("platform", "java");
+        btEvent.put("agent", "bugtracker-hybrid/1.0.0");
+
+        // contexts (OS, runtime, device)
+        Map<String, Object> contextsMap = new HashMap<>();
+        OperatingSystem os = event.getContexts().getOperatingSystem();
+        if (os != null) {
+            Map<String, Object> osMap = Map.of(
+                "name", os.getName(),
+                "version", os.getVersion()
+            );
+            contextsMap.put("os", osMap);
+        }
+        SentryRuntime runtimeCtx = event.getContexts().getRuntime();
+        if (runtimeCtx != null) {
+            Map<String, Object> rtMap = Map.of(
+                "name", runtimeCtx.getName(),
+                "version", runtimeCtx.getVersion()
+            );
+            contextsMap.put("runtime", rtMap);
+        }
+        Device device = event.getContexts().getDevice();
+        if (device != null) {
+            Map<String, Object> devMap = Map.of(
+                "manufacturer", device.getManufacturer(),
+                "model", device.getModel()
+            );
+            contextsMap.put("device", devMap);
+        }
+        btEvent.put("contexts", contextsMap);
+
+        // extras & tags
+        btEvent.put("extra", event.getExtras());
+        btEvent.put("tags", event.getTags());
+
+        // user
+        User user = event.getUser();
+        if (user != null) {
+            Map<String, Object> um = new HashMap<>();
+            um.put("id", user.getId());
+            um.put("username", user.getUsername());
+            um.put("email", user.getEmail());
+            um.put("ip_address", user.getIpAddress());
+            btEvent.put("user", um);
+        }
+
+        // breadcrumbs
+        List<Breadcrumb> bcs = event.getBreadcrumbs();
+        if (bcs != null && !bcs.isEmpty()) {
+            List<Map<String, Object>> bcList = new ArrayList<>();
+            for (Breadcrumb bc : bcs) {
+                Map<String, Object> m = Map.of(
+                    "timestamp", bc.getTimestamp(),
+                    "type", bc.getType(),
+                    "category", bc.getCategory(),
+                    "message", bc.getMessage(),
+                    "data", bc.getData()
+                );
+                bcList.add(m);
+            }
+            btEvent.put("breadcrumbs", bcList);
+        }
+
+        // exception
         if (event.getThrowable() != null) {
-            bugTrackerEvent.put("exception", formatException(event.getThrowable()));
+            btEvent.put("exception", formatException(event.getThrowable()));
         } else if (event.getExceptions() != null && !event.getExceptions().isEmpty()) {
-            SentryException sentryException = event.getExceptions().get(0);
-            Map<String, Object> exception = new HashMap<>();
-            exception.put("type", sentryException.getType());
-            exception.put("value", sentryException.getValue());
-            
-            if (sentryException.getStacktrace() != null && 
-                sentryException.getStacktrace().getFrames() != null) {
-                exception.put("stacktrace", formatStacktrace(sentryException.getStacktrace().getFrames()));
+            SentryException se = event.getExceptions().get(0);
+            Map<String, Object> exMap = new HashMap<>();
+            exMap.put("type", se.getType());
+            exMap.put("value", se.getValue());
+            if (se.getStacktrace() != null && se.getStacktrace().getFrames() != null) {
+                exMap.put("stacktrace", formatStacktrace(se.getStacktrace().getFrames()));
             }
-            
-            bugTrackerEvent.put("exception", exception);
+            btEvent.put("exception", exMap);
         }
-        
-        // Contexte
-        Map<String, Object> extraData = new HashMap<>();
-        if (event.getEnvironment() != null) {
-            extraData.put("environment", event.getEnvironment());
-        }
-        if (event.getRelease() != null) {
-            extraData.put("release", event.getRelease());
-        }
-        if (!extraData.isEmpty()) {
-            bugTrackerEvent.put("extra", extraData);
-        }
-        
-        return bugTrackerEvent;
+
+        return btEvent;
     }
+
+    /** Formate exception Java pour JSON */
+    private static Map<String, Object> formatException(Throwable t) {
+    Map<String, Object> ex = new HashMap<>();
+    ex.put("type", t.getClass().getName()); // Utilisons le nom complet, c'est plus robuste
     
-    /**
-     * Formate une exception Java
-     */
-    private static Map<String, Object> formatException(Throwable throwable) {
-        Map<String, Object> exception = new HashMap<>();
-        exception.put("type", throwable.getClass().getSimpleName());
-        exception.put("value", throwable.getMessage());
-        
-        // Stack trace
-        StackTraceElement[] stackTrace = throwable.getStackTrace();
-        if (stackTrace != null) {
-            List<Map<String, Object>> frames = new ArrayList<>();
-            for (StackTraceElement element : stackTrace) {
-                Map<String, Object> frame = new HashMap<>();
-                frame.put("filename", element.getFileName());
-                frame.put("function", element.getMethodName());
-                frame.put("lineno", element.getLineNumber());
-                frame.put("module", element.getClassName());
-                frames.add(frame);
-            }
-            exception.put("stacktrace", frames);
-        }
-        
-        return exception;
+    // On vérifie si le message est null avant de le mettre
+    if (t.getMessage() != null) {
+        ex.put("value", t.getMessage());
     }
-    
-    /**
-     * Formate une stack trace Sentry
-     */
-    private static List<Map<String, Object>> formatStacktrace(List<io.sentry.protocol.SentryStackFrame> frames) {
-        List<Map<String, Object>> stackTrace = new ArrayList<>();
-        
-        for (io.sentry.protocol.SentryStackFrame frame : frames) {
-            Map<String, Object> stackFrame = new HashMap<>();
-            if (frame.getFilename() != null) stackFrame.put("filename", frame.getFilename());
-            if (frame.getFunction() != null) stackFrame.put("function", frame.getFunction());
-            if (frame.getLineno() != null) stackFrame.put("lineno", frame.getLineno());
-            if (frame.getModule() != null) stackFrame.put("module", frame.getModule());
-            stackTrace.add(stackFrame);
+
+    StackTraceElement[] frames = t.getStackTrace();
+    if (frames != null) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (StackTraceElement f : frames) {
+            // On utilise un HashMap qui accepte les valeurs null
+            Map<String, Object> fm = new HashMap<>();
+            fm.put("filename", f.getFileName()); // Peut être null
+            fm.put("function", f.getMethodName());
+            fm.put("lineno", f.getLineNumber());
+            fm.put("module", f.getClassName());
+            list.add(fm);
         }
-        
-        return stackTrace;
+        ex.put("stacktrace", list);
+    }
+    return ex;
+}
+
+    /** Formate stacktrace Sentry */
+    private static List<Map<String, Object>> formatStacktrace(List<SentryStackFrame> frames) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (SentryStackFrame f : frames) {
+            Map<String, Object> m = new HashMap<>();
+            if (f.getFilename() != null) m.put("filename", f.getFilename());
+            if (f.getFunction() != null) m.put("function", f.getFunction());
+            if (f.getLineno() != null) m.put("lineno", f.getLineno());
+            if (f.getModule() != null) m.put("module", f.getModule());
+            list.add(m);
+        }
+        return list;
     }
 }

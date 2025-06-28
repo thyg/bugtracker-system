@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.bugtracker</groupId>
+        <artifactId>bugtracker-system-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>test-app</artifactId>
+    <name>Test Application for Agent</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.bugtracker</groupId>
+            <artifactId>bugtracker-agent</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    <!-- Configuration de build pour créer un JAR exécutable -->
+    <build>
+        <finalName>test-app</finalName> <!-- Nom du JAR sans la version -->
+        <plugins>
+            <!-- ON UTILISE LE PLUGIN ASSEMBLY POUR MIEUX CONTRÔLER LE JAR -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.bugtracker.test.AgentErrorStressTest</mainClass>
+                                </manifest>
+                            </archive>
+                            <!-- On s'assure que le nom du JAR est bien test-app.jar -->
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <appendAssemblyId>false</appendAssemblyId>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
