@@ -1,24 +1,47 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useApi } from "@/hooks/use-api"
+import { useApi } from "@/hooks/use-api" // ✅ Import du hook
 import { projectsApi } from "@/lib/api"
 import { ProjectIssues } from "@/components/project/project-issues"
 import { ProjectPerformance } from "@/components/project/project-performance"
 import { ProjectReleases } from "@/components/project/project-releases"
 import { ProjectFeedback } from "@/components/project/project-feedback"
 import { AlertTriangle, BarChart3, GitPullRequest, MessageSquare, Settings, Share2 } from "lucide-react"
+import Link from "next/link"
 
 export default function ProjectPage() {
   const { id } = useParams() as { id: string }
-  const [activeTab, setActiveTab] = useState("issues")
-  const { data: project, loading, error } = useApi(() => projectsApi.getById(id))
+  const [activeTab, setActiveTab] = useState("performance")
+  const [project, setProject] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  // ✅ Gestion manuelle de l'état pour éviter les boucles
+  useEffect(() => {
+    const loadProject = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const response = await projectsApi.getById(id)
+        setProject(response.data)
+      } catch (err) {
+        setError(err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (id) {
+      loadProject()
+    }
+  }, [id])
 
   if (loading) {
     return (
@@ -47,7 +70,7 @@ export default function ProjectPage() {
             <AlertTriangle className="h-12 w-12 text-destructive mb-4" />
             <h2 className="text-2xl font-bold mb-2">Erreur de chargement</h2>
             <p className="text-muted-foreground mb-6">
-              Impossible de charger les détails du projet. Veuillez réessayer plus tard.
+              {error?.message || "Impossible de charger les détails du projet. Veuillez réessayer plus tard."}
             </p>
             <Button onClick={() => window.location.reload()}>Réessayer</Button>
           </CardContent>
@@ -75,11 +98,11 @@ export default function ProjectPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl font-bold">{project.data.name}</h1>
-            {getStatusBadge(project.data.status)}
+            <h1 className="text-3xl font-bold">{project.name}</h1>
+            {getStatusBadge(project.status)}
           </div>
           <p className="text-muted-foreground">
-            {project.data.platform} • Dernière activité: {new Date(project.data.lastSeen).toLocaleDateString("fr-FR")}
+            {project.platform} • Dernière activité: {new Date(project.lastSeen).toLocaleDateString("fr-FR")}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -101,7 +124,7 @@ export default function ProjectPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Erreurs</p>
-                <p className="text-2xl font-bold text-destructive">{project.data.errorCount}</p>
+                <p className="text-2xl font-bold text-destructive">{project.errorCount}</p>
               </div>
               <AlertTriangle className="h-5 w-5 text-destructive" />
             </div>
@@ -112,10 +135,10 @@ export default function ProjectPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Membres</p>
-                <p className="text-2xl font-bold">{project.data.team.length}</p>
+                <p className="text-2xl font-bold">{project.team.length}</p>
               </div>
               <div className="flex -space-x-2">
-                {project.data.team.slice(0, 3).map((member, index) => (
+                {project.team.slice(0, 3).map((member, index) => (
                   <div
                     key={index}
                     className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white text-xs border-2 border-background"
@@ -123,9 +146,9 @@ export default function ProjectPage() {
                     {member.charAt(0).toUpperCase()}
                   </div>
                 ))}
-                {project.data.team.length > 3 && (
+                {project.team.length > 3 && (
                   <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs border-2 border-background">
-                    +{project.data.team.length - 3}
+                    +{project.team.length - 3}
                   </div>
                 )}
               </div>
@@ -157,42 +180,48 @@ export default function ProjectPage() {
       </div>
 
       {/* Project Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-6">
-          <TabsTrigger value="issues" className="flex items-center space-x-2">
-            <AlertTriangle className="w-4 h-4" />
-            <span>Issues</span>
-          </TabsTrigger>
-          <TabsTrigger value="performance" className="flex items-center space-x-2">
-            <BarChart3 className="w-4 h-4" />
-            <span>Performance</span>
-          </TabsTrigger>
-          <TabsTrigger value="releases" className="flex items-center space-x-2">
-            <GitPullRequest className="w-4 h-4" />
-            <span>Releases</span>
-          </TabsTrigger>
-          <TabsTrigger value="feedback" className="flex items-center space-x-2">
-            <MessageSquare className="w-4 h-4" />
-            <span>Feedback</span>
-          </TabsTrigger>
-        </TabsList>
+      {project && (
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
 
-        <TabsContent value="issues">
-          <ProjectIssues projectId={id} />
-        </TabsContent>
+            {/* Issues 
+            <TabsTrigger value="issues" className="flex items-center space-x-2">
+              <AlertTriangle className="w-4 h-4" />
+              <span>Issues</span>
+            </TabsTrigger>
+            */}
+      
+            <TabsTrigger value="performance" className="flex items-center space-x-2">
+              <BarChart3 className="w-4 h-4" />
+              <span>Performance</span>
+            </TabsTrigger>
+            <TabsTrigger value="releases" className="flex items-center space-x-2">
+              <GitPullRequest className="w-4 h-4" />
+              <span>Releases</span>
+            </TabsTrigger>
+            <TabsTrigger value="feedback" className="flex items-center space-x-2">
+              <MessageSquare className="w-4 h-4" />
+              <span>Feedback</span>
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="performance">
-          <ProjectPerformance projectId={id} />
-        </TabsContent>
+          {/* <TabsContent value="issues">
+            <ProjectIssues projectId={id} project={project} />
+          </TabsContent> */}
 
-        <TabsContent value="releases">
-          <ProjectReleases projectId={id} />
-        </TabsContent>
+          <TabsContent value="performance">
+            <ProjectPerformance projectId={id} project={project} />
+          </TabsContent>
 
-        <TabsContent value="feedback">
-          <ProjectFeedback projectId={id} />
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="releases">
+            <ProjectReleases projectId={id} project={project} />
+          </TabsContent>
+
+          <TabsContent value="feedback">
+            <ProjectFeedback projectId={id} project={project} />
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   )
 }

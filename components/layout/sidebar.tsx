@@ -12,7 +12,6 @@ import { Home, AlertTriangle, BarChart3, Settings, Users, FolderOpen, ChevronLef
   Inbox, Lightbulb, Archive, Puzzle,
 
 
-
 } from "lucide-react"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { useState } from "react"
@@ -98,26 +97,13 @@ const navSecondaryItems: NavItem[] = [
     href: "/questions",
     icon: Inbox,
   },
-  {
-    title: "Idées",
-    href: "/idees",
-    icon: Lightbulb,
-  },
+  
   {
     title: "Versions",
     href: "/versions",
     icon: Archive,
   },
-  {
-    title: "Recherche",
-    href: "/search",
-    icon: Search,
-  },
-  {
-    title: "Tableaux",
-    href: "/tableaux",
-    icon: Table,
-  },
+
 ]
 
 const navDocumentsItems: NavItem[] = [

@@ -49,15 +49,13 @@ export default function SupportPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800">
-      <header className="bg-green-700 text-white shadow-md">
-        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold hover:opacity-90">
-            Sentry CM
-          </Link>
+      <header className="text-gray-800 mt-4 shadow-md">
+        <div className="container mx-auto px-6 py-4 flex justify-end items-center">
+          
           <nav className="space-x-4">
             <Link href="/docs" className="hover:underline">Docs</Link>
             <Link href="/status" className="hover:underline">Status</Link>
-            <Button variant="secondary" size="sm" onClick={() => router.push('/support/new')}>
+            <Button variant="secondary" size="sm" onClick={() => router.push('/questions')}>
               Soumettre une demande
             </Button>
           </nav>

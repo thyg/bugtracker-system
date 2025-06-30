@@ -37,36 +37,63 @@ const mockSecurityLogs: SecurityLog[] = [
     id: '1',
     action: 'Connexion réussie',
     device: 'Windows PC',
-    location: 'Paris, France',
-    ip: '192.168.1.100',
-    timestamp: '2023-04-20T10:30:00Z',
+    location: 'Douala, Cameroun',
+    ip: '102.37.154.20',
+    timestamp: '2023-11-01T08:15:30Z',
     status: 'success'
   },
   {
     id: '2',
     action: 'Tentative de connexion échouée',
-    device: 'iPhone',
-    location: 'Londres, UK',
-    ip: '10.0.0.1',
-    timestamp: '2023-04-19T22:15:00Z',
+    device: 'Android Phone',
+    location: 'Yaoundé, Cameroun',
+    ip: '197.254.12.33',
+    timestamp: '2023-10-25T21:05:10Z',
     status: 'failed'
   },
   {
     id: '3',
     action: 'Changement de mot de passe',
     device: 'MacBook Pro',
-    location: 'New York, USA',
-    ip: '203.0.113.1',
-    timestamp: '2023-04-18T14:22:00Z',
+    location: 'Bafoussam, Cameroun',
+    ip: '196.203.45.78',
+    timestamp: '2023-09-15T14:47:50Z',
     status: 'success'
   },
   {
     id: '4',
     action: 'Connexion suspecte bloquée',
-    device: 'Android',
-    location: 'Moscow, Russia',
-    ip: '198.51.100.1',
-    timestamp: '2023-04-17T03:45:00Z',
+    device: 'iPhone 14',
+    location: 'Kribi, Cameroun',
+    ip: '196.8.23.190',
+    timestamp: '2023-08-30T03:22:05Z',
+    status: 'suspicious'
+  },
+  {
+    id: '5',
+    action: 'Connexion réussie',
+    device: 'Linux Desktop',
+    location: 'Garoua, Cameroun',
+    ip: '102.88.159.11',
+    timestamp: '2023-07-20T11:12:00Z',
+    status: 'success'
+  },
+  {
+    id: '6',
+    action: 'Tentative de connexion échouée',
+    device: 'Tablet',
+    location: 'Bertoua, Cameroun',
+    ip: '197.46.67.54',
+    timestamp: '2023-06-05T17:30:45Z',
+    status: 'failed'
+  },
+  {
+    id: '7',
+    action: 'Connexion suspecte bloquée',
+    device: 'Smart TV',
+    location: 'Ebolowa, Cameroun',
+    ip: '196.14.200.99',
+    timestamp: '2023-05-12T22:55:20Z',
     status: 'suspicious'
   }
 ]
@@ -75,28 +102,37 @@ const mockActiveSessions: ActiveSession[] = [
   {
     id: '1',
     device: 'Windows PC',
-    browser: 'Chrome 113',
-    location: 'Paris, France',
-    ip: '192.168.1.100',
-    lastActive: '2023-04-20T10:30:00Z',
+    browser: 'Chrome 115',
+    location: 'Douala, Cameroun',
+    ip: '102.37.154.20',
+    lastActive: '2023-11-01T08:15:30Z',
     current: true
   },
   {
     id: '2',
-    device: 'iPhone 14',
+    device: 'iPhone 13',
     browser: 'Safari Mobile',
-    location: 'Paris, France',
-    ip: '192.168.1.101',
-    lastActive: '2023-04-20T08:15:00Z',
+    location: 'Yaoundé, Cameroun',
+    ip: '197.254.12.33',
+    lastActive: '2023-10-25T21:05:10Z',
     current: false
   },
   {
     id: '3',
-    device: 'MacBook Pro',
-    browser: 'Firefox 112',
-    location: 'Lyon, France',
-    ip: '203.0.113.2',
-    lastActive: '2023-04-19T16:20:00Z',
+    device: 'Android Tablet',
+    browser: 'Chrome Mobile',
+    location: 'Bafoussam, Cameroun',
+    ip: '196.203.45.78',
+    lastActive: '2023-09-15T14:47:50Z',
+    current: false
+  },
+  {
+    id: '4',
+    device: 'MacBook Air',
+    browser: 'Safari 16',
+    location: 'Bamenda, Cameroun',
+    ip: '102.88.159.11',
+    lastActive: '2023-07-20T11:12:00Z',
     current: false
   }
 ]
@@ -114,7 +150,7 @@ const mockTwoFactorMethods: TwoFactorMethod[] = [
     id: '2',
     type: 'sms',
     name: 'SMS',
-    identifier: '+33 6 ** ** ** 45',
+    identifier: '+237 6** ** ** 45',
     enabled: false,
     verified: true
   },

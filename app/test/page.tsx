@@ -1,287 +1,371 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/lib/auth-context"
+import { useState } from "react";
+import { ChevronDown, Bug, CheckCircle, AlertTriangle, Clock, TrendingUp, Filter, Search, Eye, MessageSquare, User, Calendar, ArrowUp, ArrowDown, Minus, Settings, Bell, Download, RefreshCw } from "lucide-react";
 
-import * as React from "react"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+export default function UpdatesPage() {
+  const [filter, setFilter] = useState("Tous");
+  const [priority, setPriority] = useState("Toutes");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("date");
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/shared/chart"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => setIsRefreshing(false), 2000);
+  };
 
-export const description = "An interactive area chart"
-
-const chartData = [
-  { date: "2024-04-01", desktop: 222, mobile: 150 },
-  { date: "2024-04-02", desktop: 97, mobile: 180 },
-  { date: "2024-04-03", desktop: 167, mobile: 120 },
-  { date: "2024-04-04", desktop: 242, mobile: 260 },
-  { date: "2024-04-05", desktop: 373, mobile: 290 },
-  { date: "2024-04-06", desktop: 301, mobile: 340 },
-  { date: "2024-04-07", desktop: 245, mobile: 180 },
-  { date: "2024-04-08", desktop: 409, mobile: 320 },
-  { date: "2024-04-09", desktop: 59, mobile: 110 },
-  { date: "2024-04-10", desktop: 261, mobile: 190 },
-  { date: "2024-04-11", desktop: 327, mobile: 350 },
-  { date: "2024-04-12", desktop: 292, mobile: 210 },
-  { date: "2024-04-13", desktop: 342, mobile: 380 },
-  { date: "2024-04-14", desktop: 137, mobile: 220 },
-  { date: "2024-04-15", desktop: 120, mobile: 170 },
-  { date: "2024-04-16", desktop: 138, mobile: 190 },
-  { date: "2024-04-17", desktop: 446, mobile: 360 },
-  { date: "2024-04-18", desktop: 364, mobile: 410 },
-  { date: "2024-04-19", desktop: 243, mobile: 180 },
-  { date: "2024-04-20", desktop: 89, mobile: 150 },
-  { date: "2024-04-21", desktop: 137, mobile: 200 },
-  { date: "2024-04-22", desktop: 224, mobile: 170 },
-  { date: "2024-04-23", desktop: 138, mobile: 230 },
-  { date: "2024-04-24", desktop: 387, mobile: 290 },
-  { date: "2024-04-25", desktop: 215, mobile: 250 },
-  { date: "2024-04-26", desktop: 75, mobile: 130 },
-  { date: "2024-04-27", desktop: 383, mobile: 420 },
-  { date: "2024-04-28", desktop: 122, mobile: 180 },
-  { date: "2024-04-29", desktop: 315, mobile: 240 },
-  { date: "2024-04-30", desktop: 454, mobile: 380 },
-  { date: "2024-05-01", desktop: 165, mobile: 220 },
-  { date: "2024-05-02", desktop: 293, mobile: 310 },
-  { date: "2024-05-03", desktop: 247, mobile: 190 },
-  { date: "2024-05-04", desktop: 385, mobile: 420 },
-  { date: "2024-05-05", desktop: 481, mobile: 390 },
-  { date: "2024-05-06", desktop: 498, mobile: 520 },
-  { date: "2024-05-07", desktop: 388, mobile: 300 },
-  { date: "2024-05-08", desktop: 149, mobile: 210 },
-  { date: "2024-05-09", desktop: 227, mobile: 180 },
-  { date: "2024-05-10", desktop: 293, mobile: 330 },
-  { date: "2024-05-11", desktop: 335, mobile: 270 },
-  { date: "2024-05-12", desktop: 197, mobile: 240 },
-  { date: "2024-05-13", desktop: 197, mobile: 160 },
-  { date: "2024-05-14", desktop: 448, mobile: 490 },
-  { date: "2024-05-15", desktop: 473, mobile: 380 },
-  { date: "2024-05-16", desktop: 338, mobile: 400 },
-  { date: "2024-05-17", desktop: 499, mobile: 420 },
-  { date: "2024-05-18", desktop: 315, mobile: 350 },
-  { date: "2024-05-19", desktop: 235, mobile: 180 },
-  { date: "2024-05-20", desktop: 177, mobile: 230 },
-  { date: "2024-05-21", desktop: 82, mobile: 140 },
-  { date: "2024-05-22", desktop: 81, mobile: 120 },
-  { date: "2024-05-23", desktop: 252, mobile: 290 },
-  { date: "2024-05-24", desktop: 294, mobile: 220 },
-  { date: "2024-05-25", desktop: 201, mobile: 250 },
-  { date: "2024-05-26", desktop: 213, mobile: 170 },
-  { date: "2024-05-27", desktop: 420, mobile: 460 },
-  { date: "2024-05-28", desktop: 233, mobile: 190 },
-  { date: "2024-05-29", desktop: 78, mobile: 130 },
-  { date: "2024-05-30", desktop: 340, mobile: 280 },
-  { date: "2024-05-31", desktop: 178, mobile: 230 },
-  { date: "2024-06-01", desktop: 178, mobile: 200 },
-  { date: "2024-06-02", desktop: 470, mobile: 410 },
-  { date: "2024-06-03", desktop: 103, mobile: 160 },
-  { date: "2024-06-04", desktop: 439, mobile: 380 },
-  { date: "2024-06-05", desktop: 88, mobile: 140 },
-  { date: "2024-06-06", desktop: 294, mobile: 250 },
-  { date: "2024-06-07", desktop: 323, mobile: 370 },
-  { date: "2024-06-08", desktop: 385, mobile: 320 },
-  { date: "2024-06-09", desktop: 438, mobile: 480 },
-  { date: "2024-06-10", desktop: 155, mobile: 200 },
-  { date: "2024-06-11", desktop: 92, mobile: 150 },
-  { date: "2024-06-12", desktop: 492, mobile: 420 },
-  { date: "2024-06-13", desktop: 81, mobile: 130 },
-  { date: "2024-06-14", desktop: 426, mobile: 380 },
-  { date: "2024-06-15", desktop: 307, mobile: 350 },
-  { date: "2024-06-16", desktop: 371, mobile: 310 },
-  { date: "2024-06-17", desktop: 475, mobile: 520 },
-  { date: "2024-06-18", desktop: 107, mobile: 170 },
-  { date: "2024-06-19", desktop: 341, mobile: 290 },
-  { date: "2024-06-20", desktop: 408, mobile: 450 },
-  { date: "2024-06-21", desktop: 169, mobile: 210 },
-  { date: "2024-06-22", desktop: 317, mobile: 270 },
-  { date: "2024-06-23", desktop: 480, mobile: 530 },
-  { date: "2024-06-24", desktop: 132, mobile: 180 },
-  { date: "2024-06-25", desktop: 141, mobile: 190 },
-  { date: "2024-06-26", desktop: 434, mobile: 380 },
-  { date: "2024-06-27", desktop: 448, mobile: 490 },
-  { date: "2024-06-28", desktop: 149, mobile: 200 },
-  { date: "2024-06-29", desktop: 103, mobile: 160 },
-  { date: "2024-06-30", desktop: 446, mobile: 400 },
-]
-
-const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  desktop: {
-    label: "Desktop",
-    color: "red",
-  },
-  mobile: {
-    label: "Mobile",
-    color: "blue",
-  },
-} satisfies ChartConfig
-
-export default function ChartAreaInteractive() {
-  const [timeRange, setTimeRange] = React.useState("90d")
-
-  const filteredData = chartData.filter((item) => {
-    const date = new Date(item.date)
-    const referenceDate = new Date("2024-06-30")
-    let daysToSubtract = 90
-    if (timeRange === "30d") {
-      daysToSubtract = 30
-    } else if (timeRange === "7d") {
-      daysToSubtract = 7
+  const updates = [
+    {
+      id: "BT-2024-001",
+      title: "Interface utilisateur ne répond pas après connexion",
+      status: "resolved",
+      priority: "high",
+      assignee: "Marie Dubois",
+      reporter: "Jean Martin",
+      date: "2024-12-30",
+      comments: 8,
+      views: 45,
+      description: "Les utilisateurs signalent que l'interface se fige après la connexion",
+      tags: ["UI", "Authentication", "Critical"],
+      timeSpent: "4h 30m"
+    },
+    {
+      id: "BT-2024-002", 
+      title: "Erreur 500 lors de l'upload de fichiers volumineux",
+      status: "in-progress",
+      priority: "high",
+      assignee: "Pierre Moreau",
+      reporter: "Sophie Chen",
+      date: "2024-12-29",
+      comments: 12,
+      views: 67,
+      description: "Échec de l'upload pour les fichiers > 10MB",
+      tags: ["Backend", "File Upload", "Performance"],
+      timeSpent: "6h 15m"
+    },
+    {
+      id: "BT-2024-003",
+      title: "Notifications push ne s'affichent pas sur mobile",
+      status: "open",
+      priority: "medium",
+      assignee: "Lisa Wang",
+      reporter: "Alex Rodriguez",
+      date: "2024-12-28",
+      comments: 5,
+      views: 23,
+      description: "Les notifications push ne parviennent pas aux appareils iOS",
+      tags: ["Mobile", "iOS", "Notifications"],
+      timeSpent: "2h 45m"
+    },
+    {
+      id: "BT-2024-004",
+      title: "Performance lente sur la page des rapports",
+      status: "testing",
+      priority: "medium",
+      assignee: "Thomas Kumar",
+      reporter: "Emma Wilson",
+      date: "2024-12-27",
+      comments: 15,
+      views: 89,
+      description: "Temps de chargement > 10s pour les rapports complexes",
+      tags: ["Performance", "Reports", "Database"],
+      timeSpent: "8h 20m"
+    },
+    {
+      id: "BT-2024-005",
+      title: "Texte coupé dans les emails de notification",
+      status: "resolved",
+      priority: "low",
+      assignee: "Sarah Kim",
+      reporter: "David Brown",
+      date: "2024-12-26",
+      comments: 3,
+      views: 18,
+      description: "Contenu des emails tronqué sur certains clients",
+      tags: ["Email", "Templates", "UI"],
+      timeSpent: "1h 30m"
     }
-    const startDate = new Date(referenceDate)
-    startDate.setDate(startDate.getDate() - daysToSubtract)
-    return date >= startDate
-  })
+  ];
 
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
-  const { user, logout, isAuthenticated } = useAuth()
-  const router = useRouter()
+  const stats = [
+    { label: "Bugs Ouverts", value: "24", icon: Bug, color: "red", change: "+3" },
+    { label: "Résolus Cette Semaine", value: "18", icon: CheckCircle, color: "green", change: "+12" },
+    { label: "En Cours", value: "7", icon: Clock, color: "yellow", change: "-2" },
+    { label: "Temps Moyen de Résolution", value: "3.2j", icon: TrendingUp, color: "blue", change: "-0.8j" }
+  ];
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "resolved": return "bg-green-100 text-green-800";
+      case "in-progress": return "bg-blue-100 text-blue-800";
+      case "testing": return "bg-purple-100 text-purple-800";
+      case "open": return "bg-red-100 text-red-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case "high": return "text-red-600";
+      case "medium": return "text-yellow-600";
+      case "low": return "text-green-600";
+      default: return "text-gray-600";
+    }
+  };
+
+  const getPriorityIcon = (priority) => {
+    switch (priority) {
+      case "high": return <ArrowUp className="w-4 h-4" />;
+      case "medium": return <Minus className="w-4 h-4" />;
+      case "low": return <ArrowDown className="w-4 h-4" />;
+      default: return <Minus className="w-4 h-4" />;
+    }
+  };
+
+  const filteredUpdates = updates.filter(update => {
+    const matchesFilter = filter === "Tous" || update.status === filter.toLowerCase().replace("-", "-");
+    const matchesPriority = priority === "Toutes" || update.priority === priority.toLowerCase();
+    const matchesSearch = update.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         update.id.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesFilter && matchesPriority && matchesSearch;
+  });
 
   return (
-    <footer className="w-full bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 py-12 mt-12">
-     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-4">
-          Performances de notre système de gestion des bugs
-        </h2>
-
-        <p className="text-gray-600 dark:text-gray-300 mb-8 text-lg">
-          Visualisez l'efficacité de notre système de détection et correction des erreurs : 
-          analyse en temps réel, taux de résolution, rapidité d’intervention et plus encore.
-        </p>
-
-        <div className="w-full h-[400px] bg-gray-100 dark:bg-gray-800 rounded-2xl border border-dashed border-gray-400 dark:border-gray-600 flex items-center justify-center">
-          <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
-            <div className="grid flex-1 gap-1">
-              <CardTitle>Area Chart - Interactive</CardTitle>
-              <CardDescription>
-                Showing total visitors for the last 3 months
-              </CardDescription>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <h1 className="text-2xl font-bold text-gray-900">Mises à Jour Bug Tracker</h1>
+              <div className="flex items-center space-x-2">
+                <div className={`w-2 h-2 rounded-full ${isRefreshing ? 'bg-yellow-500' : 'bg-green-500'}`}></div>
+                <span className="text-sm text-gray-600">
+                  {isRefreshing ? 'Actualisation...' : 'Synchronisé'}
+                </span>
+              </div>
             </div>
-            <Select value={timeRange} onValueChange={setTimeRange}>
-              <SelectTrigger
-                className="hidden w-[160px] rounded-lg sm:ml-auto sm:flex"
-                aria-label="Select a value"
+            
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
               >
-                <SelectValue placeholder="Last 3 months" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                <SelectItem value="90d" className="rounded-lg">
-                  Last 3 months
-                </SelectItem>
-                <SelectItem value="30d" className="rounded-lg">
-                  Last 30 days
-                </SelectItem>
-                <SelectItem value="7d" className="rounded-lg">
-                  Last 7 days
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </CardHeader>
-          <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-            <ChartContainer
-              config={chartConfig}
-              className="aspect-auto h-[250px] w-full"
-            >
-              <AreaChart data={filteredData}>
-                <defs>
-                  <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
-                    <stop
-                      offset="5%"
-                      stopColor="var(--color-desktop)"
-                      stopOpacity={0.8}
-                    />
-                    <stop
-                      offset="95%"
-                      stopColor="var(--color-desktop)"
-                      stopOpacity={0.1}
-                    />
-                  </linearGradient>
-                  <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
-                    <stop
-                      offset="5%"
-                      stopColor="var(--color-mobile)"
-                      stopOpacity={0.8}
-                    />
-                    <stop
-                      offset="95%"
-                      stopColor="var(--color-mobile)"
-                      stopOpacity={0.1}
-                    />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid vertical={false} />
-                <XAxis
-                  dataKey="date"
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={8}
-                  minTickGap={32}
-                  tickFormatter={(value) => {
-                    const date = new Date(value)
-                    return date.toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })
-                  }}
-                />
-                <ChartTooltip
-                  cursor={false}
-                  content={
-                    <ChartTooltipContent
-                      labelFormatter={(value) => {
-                        return new Date(value).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                        })
-                      }}
-                      indicator="dot"
-                    />
-                  }
-                />
-                <Area
-                  dataKey="mobile"
-                  type="natural"
-                  fill="url(#fillMobile)"
-                  stroke="var(--color-mobile)"
-                  stackId="a"
-                />
-                <Area
-                  dataKey="desktop"
-                  type="natural"
-                  fill="url(#fillDesktop)"
-                  stroke="var(--color-desktop)"
-                  stackId="a"
-                />
-                <ChartLegend content={<ChartLegendContent />} />
-              </AreaChart>
-            </ChartContainer>
-          </CardContent>
+                <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                <span>Actualiser</span>
+              </button>
+              
+              <button className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                <Download className="w-4 h-4" />
+                <span>Exporter</span>
+              </button>
+              
+              <button className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                <Bug className="w-4 h-4" />
+                <span>Nouveau Bug</span>
+              </button>
+            </div>
+          </div>
         </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {stats.map((stat, index) => (
+            <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-600">{stat.label}</p>
+                  <div className="flex items-center space-x-2 mt-1">
+                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                    <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+                      stat.change.startsWith('+') ? 'bg-green-100 text-green-700' :
+                      stat.change.startsWith('-') && stat.label.includes('Temps') ? 'bg-green-100 text-green-700' :
+                      stat.change.startsWith('-') ? 'bg-red-100 text-red-700' :
+                      'bg-gray-100 text-gray-700'
+                    }`}>
+                      {stat.change}
+                    </span>
+                  </div>
+                </div>
+                <div className={`p-3 rounded-lg bg-${stat.color}-100`}>
+                  <stat.icon className={`w-6 h-6 text-${stat.color}-600`} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Filters and Search */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center space-x-2">
+              <Search className="w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Rechercher un bug..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="border border-gray-300 bg-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="Tous">Tous les Statuts</option>
+              <option value="open">Ouverts</option>
+              <option value="in-progress">En Cours</option>
+              <option value="testing">En Test</option>
+              <option value="resolved">Résolus</option>
+            </select>
+            
+            <select
+              value={priority}
+              onChange={(e) => setPriority(e.target.value)}
+              className="border border-gray-300 bg-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="Toutes">Toutes Priorités</option>
+              <option value="high">Haute</option>
+              <option value="medium">Moyenne</option>
+              <option value="low">Basse</option>
+            </select>
+            
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="border border-gray-300 bg-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="date">Trier par Date</option>
+              <option value="priority">Trier par Priorité</option>
+              <option value="status">Trier par Statut</option>
+              <option value="assignee">Trier par Assigné</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Bug List */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900">
+                Bugs Récents ({filteredUpdates.length})
+              </h2>
+              <div className="flex items-center space-x-2">
+                <Settings className="w-5 h-5 text-gray-400" />
+                <span className="text-sm text-gray-600">Configurer les colonnes</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="divide-y divide-gray-200">
+            {filteredUpdates.map((update) => (
+              <div key={update.id} className="p-6 hover:bg-gray-50 transition-colors">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
+                        {update.id}
+                      </span>
+                      <div className={`flex items-center space-x-1 ${getPriorityColor(update.priority)}`}>
+                        {getPriorityIcon(update.priority)}
+                        <span className="text-sm font-medium capitalize">{update.priority}</span>
+                      </div>
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(update.status)}`}>
+                        {update.status === 'in-progress' ? 'En Cours' :
+                         update.status === 'resolved' ? 'Résolu' :
+                         update.status === 'testing' ? 'En Test' :
+                         update.status === 'open' ? 'Ouvert' : update.status}
+                      </span>
+                    </div>
+                    
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{update.title}</h3>
+                    <p className="text-gray-600 mb-3">{update.description}</p>
+                    
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {update.tags.map((tag, index) => (
+                        <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    
+                    <div className="flex items-center space-x-6 text-sm text-gray-600">
+                      <div className="flex items-center space-x-1">
+                        <User className="w-4 h-4" />
+                        <span>Assigné: {update.assignee}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <User className="w-4 h-4" />
+                        <span>Rapporté par: {update.reporter}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Calendar className="w-4 h-4" />
+                        <span>{new Date(update.date).toLocaleDateString('fr-FR')}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Clock className="w-4 h-4" />
+                        <span>{update.timeSpent}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-4 ml-6">
+                    <div className="flex items-center space-x-4 text-sm text-gray-600">
+                      <div className="flex items-center space-x-1">
+                        <MessageSquare className="w-4 h-4" />
+                        <span>{update.comments}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Eye className="w-4 h-4" />
+                        <span>{update.views}</span>
+                      </div>
+                    </div>
+                    
+                    <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                      Voir Détails
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {filteredUpdates.length === 0 && (
+            <div className="p-12 text-center">
+              <Bug className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun bug trouvé</h3>
+              <p className="text-gray-600">Essayez de modifier vos filtres ou votre recherche.</p>
+            </div>
+          )}
+        </div>
+        
+        {/* Pagination */}
+        {filteredUpdates.length > 0 && (
+          <div className="mt-6 flex items-center justify-between">
+            <p className="text-sm text-gray-600">
+              Affichage de {filteredUpdates.length} sur {updates.length} bugs
+            </p>
+            <div className="flex items-center space-x-2">
+              <button className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                Précédent
+              </button>
+              <button className="px-3 py-2 bg-blue-600 text-white rounded-lg">1</button>
+              <button className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                Suivant
+              </button>
+            </div>
+          </div>
+        )}
       </div>
-    </footer>
-  )
+    </div>
+  );
 }
+
+
+// bon ici ohhh

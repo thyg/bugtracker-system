@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TablePagination } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -15,7 +15,8 @@ import { AlertTriangle, AlertCircle, Info, Search, Filter, User } from "lucide-r
 import { formatDate } from "@/lib/utils"
 
 interface ProjectIssuesProps {
-  projectId: string
+  projectId: string 
+  project?: any // Optionnel, au cas où vous voulez l'utiliser plus tard
 }
 
 export function ProjectIssues({ projectId }: ProjectIssuesProps) {
@@ -27,7 +28,8 @@ export function ProjectIssues({ projectId }: ProjectIssuesProps) {
   })
   const [searchQuery, setSearchQuery] = useState("")
 
-  const { data, loading, error } = useApi(() =>
+  // ✅ Utilisation de useCallback pour éviter les re-renders
+  const fetchIssues = useCallback(() =>
     issuesApi.getAll({
       page,
       limit: 10,
@@ -35,7 +37,10 @@ export function ProjectIssues({ projectId }: ProjectIssuesProps) {
       status: filters.status || undefined,
       level: filters.level || undefined,
     }),
+    [page, projectId, filters.status, filters.level]
   )
+
+  const { data, loading, error } = useApi(fetchIssues)
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }))
@@ -68,9 +73,13 @@ export function ProjectIssues({ projectId }: ProjectIssuesProps) {
     }
   }
 
-  const filteredIssues = data?.data.filter((issue) =>
-    searchQuery ? issue.title.toLowerCase().includes(searchQuery.toLowerCase()) : true,
-  )
+  // ✅ Protection contre les données undefined avec vérifications multiples
+  const issues = data?.data || []
+  const filteredIssues = Array.isArray(issues) 
+    ? issues.filter((issue) =>
+        searchQuery ? issue.title.toLowerCase().includes(searchQuery.toLowerCase()) : true,
+      )
+    : []
 
   if (loading) {
     return (
@@ -91,7 +100,9 @@ export function ProjectIssues({ projectId }: ProjectIssuesProps) {
         <CardContent className="flex flex-col items-center justify-center py-12">
           <AlertTriangle className="h-12 w-12 text-destructive mb-4" />
           <h2 className="text-2xl font-bold mb-2">Erreur de chargement</h2>
-          <p className="text-muted-foreground mb-6">Impossible de charger les issues. Veuillez réessayer plus tard.</p>
+          <p className="text-muted-foreground mb-6">
+            {error?.message || "Impossible de charger les issues. Veuillez réessayer plus tard."}
+          </p>
           <Button onClick={() => window.location.reload()}>Réessayer</Button>
         </CardContent>
       </Card>
@@ -142,7 +153,7 @@ export function ProjectIssues({ projectId }: ProjectIssuesProps) {
             <Filter className="mr-2 h-5 w-5" />
             Issues
             <Badge variant="outline" className="ml-2">
-              {data.pagination.total}
+              {data?.pagination?.total || 0}
             </Badge>
           </CardTitle>
         </CardHeader>
@@ -160,14 +171,14 @@ export function ProjectIssues({ projectId }: ProjectIssuesProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredIssues?.length === 0 ? (
+              {filteredIssues.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                     Aucune issue trouvée
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredIssues?.map((issue) => (
+                filteredIssues.map((issue) => (
                   <TableRow
                     key={issue.id}
                     className="cursor-pointer hover:bg-muted/50"
@@ -207,7 +218,7 @@ export function ProjectIssues({ projectId }: ProjectIssuesProps) {
             </TableBody>
           </Table>
 
-          {data.pagination.totalPages > 1 && (
+          {data?.pagination?.totalPages > 1 && (
             <div className="mt-4">
               <TablePagination
                 currentPage={page}

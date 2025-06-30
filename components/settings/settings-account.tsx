@@ -27,16 +27,17 @@ export function SettingsAccount() {
     formState: { errors },
   } = useForm<AccountFormValues>({
     defaultValues: {
-      firstName: "John",
-      lastName: "Doe",
-      email: "john.doe@example.com",
-      phone: "+33 6 12 34 56 78",
-      dateOfBirth: "1990-05-15",
+      firstName: "Marie",
+      lastName: "N’Djock",
+      email: "marie.ndjock@example.cm",
+      phone: "+237 6 75 12 34 56",
+      dateOfBirth: "1992-09-07",
       language: "fr",
-      timezone: "Europe/Paris",
+      timezone: "Africa/Douala",
     },
+    
   })
-
+ 
   const onSubmit = async (data: AccountFormValues) => {
     setIsLoading(true)
     try {

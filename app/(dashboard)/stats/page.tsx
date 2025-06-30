@@ -10,6 +10,8 @@ import {
   Clock, CheckCircle, AlertCircle, Star, Award, Zap 
 } from "lucide-react"
 
+import Link from "next/link"
+
 // Données simulées pour l'utilisateur
 const userActivityData = [
   { date: "2024-06-01", bugs_reported: 5, bugs_resolved: 3, time_spent: 120 },
@@ -402,15 +404,19 @@ export default function UserStatistics() {
           <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-8">
             <h3 className="text-xl font-bold text-gray-900 mb-6">Actions Rapides</h3>
             <div className="space-y-4">
+              <Link href="/questions">
               <button className="w-full p-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium">
                 Signaler un Bug
               </button>
+              </Link>
               <button className="w-full p-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors font-medium">
                 Voir Mes Tâches
               </button>
+              <Link href="/reports">
               <button className="w-full p-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors font-medium">
                 Rapport Mensuel
               </button>
+              </Link>
             </div>
           </div>
         </div>

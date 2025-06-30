@@ -30,11 +30,8 @@ import { useApi } from "@/hooks/use-api"
 import { analyticsApi } from "@/lib/api"
 import { Skeleton } from "@/components/ui/skeleton"
 import { formatDate } from "@/lib/utils"
-
-
-
+import Link from "next/link"
 import { Area, AreaChart, CartesianGrid, XAxis, Bar, BarChart, YAxis } from "recharts"
-
 
 import {
   ChartConfig,
@@ -42,14 +39,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/shared/chart"
-
-
-
-
-
-
-
-export const description = "An area chart with axes"
 
 const chartData = [
   { month: "January", desktop: 186, mobile: 80 },
@@ -70,20 +59,6 @@ const chartConfig = {
     color: "blue",
   },
 } satisfies ChartConfig
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 // Composants UI avec Tailwind CSS
@@ -477,129 +452,173 @@ function DashboardStats() {
           />
         </div>
 
-        {/* Graphiques principaux */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" />
+        {/* Section des graphiques principaux */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          {/* Graphique 1: Évolution des erreurs */}
+          <Card className="shadow-lg border-0 bg-white">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-800">
+                <div className="p-2 bg-blue-50 rounded-lg">
+                  <BarChart3 className="h-5 w-5 text-blue-600" />
+                </div>
                 Évolution des erreurs
               </CardTitle>
+              <p className="text-sm text-gray-600 mt-1">
+                Suivi temporel des erreurs par plateforme
+              </p>
             </CardHeader>
-            <CardContent>
-              <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
-                <div className="text-center">
-                  
-                    <CardHeader>
-                     
-                      <CardDescription>
-                        Showing total visitors for the last 6 months
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <ChartContainer config={chartConfig}>
-                        <AreaChart
-                          accessibilityLayer
-                          data={chartData}
-                          margin={{
-                            left: -20,
-                            right: 12,
-                          }}
-                        >
-                          <CartesianGrid vertical={false} />
-                          <XAxis
-                            dataKey="month"
-                            tickLine={false}
-                            axisLine={false}
-                            tickMargin={8}
-                            tickFormatter={(value) => value.slice(0, 3)}
-                          />
-                          <YAxis
-                            tickLine={false}
-                            axisLine={false}
-                            tickMargin={8}
-                            tickCount={3}
-                          />
-                          <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                          <Area
-                            dataKey="mobile"
-                            type="natural"
-                            fill="var(--color-mobile)"
-                            fillOpacity={0.4}
-                            stroke="var(--color-mobile)"
-                            stackId="a"
-                          />
-                          <Area
-                            dataKey="desktop"
-                            type="natural"
-                            fill="var(--color-desktop)"
-                            fillOpacity={0.4}
-                            stroke="var(--color-desktop)"
-                            stackId="a"
-                          />
-                        </AreaChart>
-                      </ChartContainer>
-                    </CardContent>
-                    <CardFooter>
-                      <div className="flex w-full items-start gap-2 text-sm">
-                        <div className="grid gap-2">
-                          <div className="flex items-center gap-2 leading-none font-medium">
-                            Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-                          </div>
-                          
-                        </div>
-                      </div>
-                    </CardFooter>
-                  
+            <CardContent className="pt-0">
+              <div className="h-80 w-full">
+                <ChartContainer config={chartConfig} className="h-full w-full">
+                  <AreaChart
+                    accessibilityLayer
+                    data={chartData}
+                    margin={{
+                      top: 20,
+                      left: 12,
+                      right: 20,
+                      bottom: 12,
+                    }}
+                  >
+                    <CartesianGrid 
+                      vertical={false} 
+                      strokeDasharray="3 3"
+                      stroke="#e5e7eb"
+                    />
+                    <XAxis
+                      dataKey="month"
+                      tickLine={false}
+                      axisLine={false}
+                      tickMargin={12}
+                      tick={{ fontSize: 12, fill: '#6b7280' }}
+                      tickFormatter={(value) => value.slice(0, 3)}
+                    />
+                    <YAxis
+                      tickLine={false}
+                      axisLine={false}
+                      tickMargin={12}
+                      tick={{ fontSize: 12, fill: '#6b7280' }}
+                      tickCount={5}
+                    />
+                    <ChartTooltip 
+                      cursor={{ strokeDasharray: "3 3" }} 
+                      content={<ChartTooltipContent className="bg-white shadow-lg border rounded-lg" />} 
+                    />
+                    <defs>
+                      <linearGradient id="colorMobile" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="var(--color-mobile)" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="var(--color-mobile)" stopOpacity={0.1}/>
+                      </linearGradient>
+                      <linearGradient id="colorDesktop" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="var(--color-desktop)" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="var(--color-desktop)" stopOpacity={0.1}/>
+                      </linearGradient>
+                    </defs>
+                    <Area
+                      dataKey="mobile"
+                      type="monotone"
+                      fill="url(#colorMobile)"
+                      stroke="var(--color-mobile)"
+                      strokeWidth={2}
+                      stackId="a"
+                    />
+                    <Area
+                      dataKey="desktop"
+                      type="monotone"
+                      fill="url(#colorDesktop)"
+                      stroke="var(--color-desktop)"
+                      strokeWidth={2}
+                      stackId="a"
+                    />
+                  </AreaChart>
+                </ChartContainer>
+              </div>
+              
+              {/* Légende personnalisée */}
+              <div className="flex items-center justify-center gap-6 mt-4 pt-4 border-t border-gray-100">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <span className="text-sm font-medium text-gray-700">Desktop</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                  <span className="text-sm font-medium text-gray-700">Mobile</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Server className="h-5 w-5" />
+          {/* Graphique 2: Répartition des performances */}
+          <Card className="shadow-lg border-0 bg-white">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-3 text-lg font-semibold text-gray-800">
+                <div className="p-2 bg-green-50 rounded-lg">
+                  <Server className="h-5 w-5 text-green-600" />
+                </div>
                 Répartition des performances
               </CardTitle>
+              <p className="text-sm text-gray-600 mt-1">
+                Comparaison des performances par plateforme
+              </p>
             </CardHeader>
-            <CardContent>
-              <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+            <CardContent className="pt-0">
+              <div className="h-80 w-full">
+                <ChartContainer config={chartConfig} className="h-full w-full">
+                  <BarChart 
+                    accessibilityLayer 
+                    data={chartData}
+                    margin={{
+                      top: 20,
+                      left: 12,
+                      right: 20,
+                      bottom: 12,
+                    }}
+                  >
+                    <CartesianGrid 
+                      vertical={false} 
+                      strokeDasharray="3 3"
+                      stroke="#e5e7eb"
+                    />
+                    <XAxis
+                      dataKey="month"
+                      tickLine={false}
+                      tickMargin={12}
+                      axisLine={false}
+                      tick={{ fontSize: 12, fill: '#6b7280' }}
+                      tickFormatter={(value) => value.slice(0, 3)}
+                    />
+                    <ChartTooltip
+                      cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
+                      content={<ChartTooltipContent 
+                        indicator="dashed" 
+                        className="bg-white shadow-lg border rounded-lg"
+                      />}
+                    />
+                    <Bar 
+                      dataKey="desktop" 
+                      fill="var(--color-desktop)" 
+                      radius={[6, 6, 0, 0]}
+                      maxBarSize={40}
+                    />
+                    <Bar 
+                      dataKey="mobile" 
+                      fill="var(--color-mobile)" 
+                      radius={[6, 6, 0, 0]}
+                      maxBarSize={40}
+                    />
+                  </BarChart>
+                </ChartContainer>
+              </div>
+              
+              {/* Statistiques rapides */}
+              <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100">
                 <div className="text-center">
-                  
-                    <CardHeader>
-                      <CardTitle>Bar Chart - Multiple</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ChartContainer config={chartConfig}>
-                        <BarChart accessibilityLayer data={chartData}>
-                          <CartesianGrid vertical={false} />
-                          <XAxis
-                            dataKey="month"
-                            tickLine={false}
-                            tickMargin={10}
-                            axisLine={false}
-                            tickFormatter={(value) => value.slice(0, 3)}
-                          />
-                          <ChartTooltip
-                            cursor={false}
-                            content={<ChartTooltipContent indicator="dashed" />}
-                          />
-                          <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-                          <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
-                        </BarChart>
-                      </ChartContainer>
-                    </CardContent>
-                    <CardFooter className="flex-col items-start gap-2 text-sm">
-                      <div className="flex gap-2 leading-none font-medium">
-                        Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-                      </div>
-                      <div className="text-muted-foreground leading-none">
-                        Showing total visitors for the last 6 months
-                      </div>
-                    </CardFooter>
-                  
-                
+                  <div className="text-2xl font-bold text-red-600">85%</div>
+                  <div className="text-xs text-gray-500 uppercase tracking-wider">Desktop</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">92%</div>
+                  <div className="text-xs text-gray-500 uppercase tracking-wider">Mobile</div>
                 </div>
               </div>
             </CardContent>
@@ -809,10 +828,12 @@ export default function DashboardPage() {
             <p className="text-muted-foreground">Vue d'ensemble de vos applications et projets</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm">
-              <Bell className="h-4 w-4 mr-2" />
-              Alertes
-            </Button>
+            <Link href="/alertes">
+              <Button variant="outline" size="sm">
+                <Bell className="h-4 w-4 mr-2" />
+                Alertes
+              </Button>
+            </Link>
             <Button size="sm">
               <Globe className="h-4 w-4 mr-2" />
               Voir le statut public

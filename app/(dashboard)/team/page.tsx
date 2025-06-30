@@ -4,6 +4,11 @@ import { useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { Users, UserPlus, Mail, Crown, Shield, Edit3, Trash2, MoreVertical, Search, Filter, Loader2 } from "lucide-react"
 
+interface TeamInvite {
+  email: string
+  role: 'admin' | 'member' | 'viewer'
+  message?: string
+}
 interface TeamMember {
   id: string
   name: string
@@ -14,44 +19,70 @@ interface TeamMember {
   avatar?: string
 }
 
-interface TeamInvite {
-  email: string
-  role: 'admin' | 'member' | 'viewer'
-  message?: string
-}
-
 const mockTeamMembers: TeamMember[] = [
   {
     id: '1',
-    name: 'John Doe',
-    email: 'john.doe@example.com',
+    name: 'Emmanuel Achu',
+    email: 'emmanuel.achu@example.cm',
     role: 'owner',
     status: 'active',
-    joinedAt: '2023-01-15',
+    joinedAt: '2022-11-12',
   },
   {
     id: '2',
-    name: 'Jane Smith',
-    email: 'jane.smith@example.com',
+    name: 'Marie-Thérèse Mbarga',
+    email: 'marie.mbarga@example.cm',
     role: 'admin',
     status: 'active',
-    joinedAt: '2023-02-20',
+    joinedAt: '2023-01-08',
   },
   {
     id: '3',
-    name: 'Mike Johnson',
-    email: 'mike.johnson@example.com',
-    role: 'member',
+    name: 'Jean-Paul Fotso',
+    email: 'jeanpaul.fotso@example.cm',
+    role: 'admin',
     status: 'active',
-    joinedAt: '2023-03-10',
+    joinedAt: '2023-02-14',
   },
   {
     id: '4',
-    name: 'Sarah Wilson',
-    email: 'sarah.wilson@example.com',
+    name: 'Nathalie Tsimi',
+    email: 'nathalie.tsimi@example.cm',
+    role: 'member',
+    status: 'active',
+    joinedAt: '2023-03-22',
+  },
+  {
+    id: '5',
+    name: 'Roger Mveng',
+    email: 'roger.mveng@example.cm',
+    role: 'member',
+    status: 'inactive',
+    joinedAt: '2023-04-30',
+  },
+  {
+    id: '6',
+    name: 'Aïcha Bah',
+    email: 'aicha.bah@example.cm',
+    role: 'member',
+    status: 'pending',
+    joinedAt: '2023-05-18',
+  },
+  {
+    id: '7',
+    name: 'Samuel Nkeng',
+    email: 'samuel.nkeng@example.cm',
+    role: 'viewer',
+    status: 'active',
+    joinedAt: '2023-06-05',
+  },
+  {
+    id: '8',
+    name: 'Céline Essama',
+    email: 'celine.essama@example.cm',
     role: 'viewer',
     status: 'pending',
-    joinedAt: '2023-04-05',
+    joinedAt: '2023-06-25',
   },
 ]
 
