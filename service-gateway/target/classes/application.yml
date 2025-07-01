@@ -1,0 +1,17 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: traitement_route
+          # On utilise l'URI la plus directe possible
+          uri: http://service-traitement:8082
+          predicates:
+            - Path=/api/bugs/**
+        - id: ingestion_route
+          uri: http://service-ingestion:8081
+          predicates:
+            - Path=/api/errors/**

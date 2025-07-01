@@ -1,0 +1,160 @@
+import {
+  RefreshCw,
+  Inbox,
+  Code,
+  Zap,
+  Filter,
+  TrendingUp,
+  Play,
+  PackagePlus,
+  Megaphone,
+  Clock,
+  AlertCircle,
+  Hammer,
+  Layout,
+  Archive,
+  BarChart2,
+} from "lucide-react";
+
+const sidebarItems = [
+  {
+    title: "Actualiser",
+    href: "/refresh",
+    icon: <RefreshCw />,
+  },
+  {
+    title: "Boîte de réception",
+    href: "/inbox",
+    icon: <Inbox />,
+  },
+  {
+    title: "Dépôts",
+    href: "/code",
+    icon: <Code />,
+  },
+  {
+    title: "Pipeline",
+    href: "/pipeline",
+    icon: <Zap />,
+  },
+  {
+    title: "Filtres",
+    href: "/filters",
+    icon: <Filter />,
+  },
+  {
+    title: "Analytique",
+    href: "/analytics",
+    icon: <TrendingUp />,
+  },
+  {
+    title: "Exécution",
+    href: "/run",
+    icon: <Play />,
+  },
+  {
+    title: "Intégrations",
+    href: "/integrations",
+    icon: <PackagePlus />,
+  },
+  {
+    title: "Annonces",
+    href: "/annonces",
+    icon: <Megaphone />,
+  },
+  {
+    title: "Historique",
+    href: "/history",
+    icon: <Clock />,
+  },
+  {
+    title: "Alertes",
+    href: "/alerts",
+    icon: <AlertCircle />,
+  },
+  {
+    title: "Actions",
+    href: "/actions",
+    icon: <Hammer />,
+  },
+  {
+    title: "Disposition",
+    href: "/layout",
+    icon: <Layout />,
+  },
+  {
+    title: "Archives",
+    href: "/archives",
+    icon: <Archive />,
+  },
+  {
+    title: "Graphiques",
+    href: "/charts",
+    icon: <BarChart2 />,
+  },
+];
+
+export default sidebarItems;
+
+
+
+
+
+
+
+
+
+
+
+Pour une **page de démonstration (demo)** sur ton **site web de bug tracker**, tu veux impressionner les visiteurs tout en leur montrant les **fonctionnalités clés**, la **valeur ajoutée** et **l'expérience utilisateur** de ton produit.
+
+---
+
+## 🎯 Objectif de la page demo
+
+* Montrer **à quoi ressemble** le bug tracker.
+* Permettre à l’utilisateur d’**essayer rapidement** (sans inscription si possible).
+* Mettre en avant les **points forts** : rapidité, collaboration, assignation, filtres, vue Kanban, etc.
+
+
+* Une animation courte (30s–1min) montrant :
+
+  * Création d’un ticket
+  * Attribution à un développeur
+  * Évolution de statut (To Do → In Progress → Done)
+
+* Interface réelle, sans possibilité de modifier les données.
+* Montre : dashboard, ticket list, vue Kanban, détails du ticket.
+* Permet de créer/modifier des tickets.
+
+### 4. **Capture d’écran interactive (hover/click pour zoom)**
+
+* Affiche des captures cliquables :
+
+  * Vue d’ensemble
+  * Ticket details
+  * Filtres de recherche
+  * Notifications en temps réel
+
+
+
+### 5. **Mises en avant des fonctionnalités**
+
+Présente-les par blocs :
+
+* ✅ Création rapide de tickets
+* 👥 Assignation à des membres
+* 📦 Gestion par projet
+* 🏷️ Tags & priorité
+* 📊 Graphiques et reporting
+
+
+
+* **S’inscrire gratuitement**
+* **Voir les tarifs**
+* **Contacter l’équipe**
+
+* **Animation** : Framer Motion, Lottie pour onboarding
+
+
+

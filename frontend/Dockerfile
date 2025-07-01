@@ -1,14 +1,37 @@
-FROM nginx:alpine
+# === ÉTAPE 1: Build de l'application Next.js avec NPM ===
+FROM node:18-alpine AS builder
+WORKDIR /app
 
-# Créer le répertoire de destination
-RUN mkdir -p /usr/share/nginx/html
+# On copie package.json ET package-lock.json
+COPY package*.json ./
 
-# Copier le contenu web s'il existe, sinon créer une page par défaut
-RUN echo '<h1>BugTracker Frontend</h1><p>En cours de développement...</p>' > /usr/share/nginx/html/index.html
+# On installe les dépendances avec npm
+RUN npm install
 
-# Copier la configuration nginx
-COPY nginx.conf /etc/nginx/nginx.conf
+# On copie le reste du code source
+COPY . .
 
-EXPOSE 80
+# On déclare la variable d'environnement pour l'URL de l'API
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
-CMD ["nginx", "-g", "daemon off;"]
+# On lance le build de production avec npm
+RUN npm run build
+
+# === ÉTAPE 2: Servir l'application avec le serveur Next.js ===
+FROM node:18-alpine
+
+WORKDIR /app
+
+# On copie les fichiers nécessaires depuis l'étape de build
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./
+#COPY --from=builder /app/next.config.js ./
+
+# On expose le port sur lequel Next.js écoute (par défaut 3000)
+EXPOSE 3000
+
+# La commande pour démarrer le serveur de production Next.js
+CMD ["npm", "start"]

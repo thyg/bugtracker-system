@@ -1,2 +1,8 @@
-com/bugtracker/service_traitement/controller/TestController.class
+com/bugtracker/service_traitement/model/BugReportEntity.class
+com/bugtracker/service_traitement/config/WebConfig$1.class
+com/bugtracker/service_traitement/repository/BugReportRepository.class
+com/bugtracker/service_traitement/service/BugConsumerService$1.class
+com/bugtracker/service_traitement/service/BugConsumerService.class
 com/bugtracker/service_traitement/ServiceTraitementApplication.class
+com/bugtracker/service_traitement/config/WebConfig.class
+com/bugtracker/service_traitement/controller/BugReportController.class
