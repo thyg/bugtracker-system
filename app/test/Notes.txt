@@ -61,7 +61,7 @@ const sidebarItems = [
     title: "Annonces",
     href: "/annonces",
     icon: <Megaphone />,
-  },
+  },sonne
   {
     title: "Historique",
     href: "/history",
@@ -158,3 +158,174 @@ Présente-les par blocs :
 
 
 
+
+
+
+
+
+
+Étape 3 : Intégration dans vos pages
+Modifiez chaque page existante :
+jsximport SEO from '../components/SEO'
+
+export default function MaPage() {
+  return (
+    <>
+      <SEO 
+        title="Titre de ma page"
+        description="Description de ma page pour le SEO"
+        url="https://monsite.com/ma-page"
+        image="/images/ma-page-og.jpg"
+      />
+      {/* Votre contenu existant */}
+    </>
+  )
+}
+
+
+
+
+
+
+
+
+
+
+
+import Image from 'next/image'
+
+// Avant
+<img src="/photo.jpg" alt="Description" />
+
+// Après
+<Image 
+  src="/photo.jpg" 
+  alt="Description" 
+  width={800} 
+  height={600}
+  priority // Pour les images above-the-fold
+/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ÉTAPE 5 : Implémentation de getStaticProps
+1. Dans vos pages existantes, ajoutez getStaticProps :
+jsx// pages/destinations.js (exemple)
+export default function Destinations({ destinations }) {
+  return (
+    <>
+      <SEO 
+        title="Nos Destinations"
+        description="Découvrez nos destinations de voyage"
+      />
+      <div>
+        {destinations.map(dest => (
+          <div key={dest.id}>{dest.name}</div>
+        ))}
+      </div>
+    </>
+  )
+}
+
+export async function getStaticProps() {
+  try {
+    // Remplacez par votre vraie API
+    const res = await fetch('https://votre-api.com/destinations')
+    const destinations = await res.json()
+
+    return {
+      props: {
+        destinations,
+      },
+      revalidate: 3600, // Régénère toutes les heures
+    }
+  } catch (error) {
+    return {
+      props: {
+        destinations: [],
+      },
+    }
+  }
+}
+2. Pour les pages dynamiques, utilisez getStaticPaths :
+jsx// pages/destination/[slug].js
+export async function getStaticPaths() {
+  const res = await fetch('https://votre-api.com/destinations')
+  const destinations = await res.json()
+
+  const paths = destinations.map((dest) => ({
+    params: { slug: dest.slug },
+  }))
+
+  return { paths, fallback: 'blocking' }
+}
+
+export async function getStaticProps({ params }) {
+  const res = await fetch(`https://votre-api.com/destinations/${params.slug}`)
+  const destination = await res.json()
+
+  return {
+    props: { destination },
+    revalidate: 3600,
+  }
+}
+
+
+
+
+
+
+
+
+
+
+🎯 Prochaines étapes SEO
+1. Appliquer le SEO aux autres pages importantes
+Exemple pour app/dashboard/layout.tsx :
+tsximport { generateSEOMetadata } from "@/components/SEO"
+
+export const metadata = generateSEOMetadata({
+  title: "Dashboard",
+  description: "Tableau de bord de gestion des bugs et projets",
+  url: "/dashboard",
+})
+
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>
+}
+2. Optimiser les pages dynamiques
+Pour app/issues/[id]/page.tsx :
+tsximport { generateSEOMetadata } from "@/components/SEO"
+
+export async function generateMetadata({ params }: { params: { id: string } }) {
+  // Récupérer les données du bug
+  const issue = await getIssue(params.id) // Votre fonction de récupération
+  
+  return generateSEOMetadata({
+    title: `Issue #${params.id}: ${issue?.title || 'Bug Report'}`,
+    description: issue?.description || 'Détails du bug et suivi de résolution',
+    url: `/issues/${params.id}`,
+  })
+}
+3. Créer des images Open Graph
+Créez des images optimisées dans public/images/ :
+
+og-default.jpg (1200x630px)
+og-dashboard.jpg
+og-pricing.jpg
+
+🚀 Test final

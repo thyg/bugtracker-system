@@ -145,16 +145,17 @@ export default function SettingsBilling() {
   const [showBillingAddressModal, setShowBillingAddressModal] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [billingAddress, setBillingAddress] = useState<BillingAddress>({
-    name: 'Jean Dupont',
-    email: 'jean.dupont@example.com',
-    phone: '+33 1 23 45 67 89',
-    address: '123 Rue de la Paix',
-    city: 'Paris',
-    postalCode: '75001',
-    country: 'France',
-    company: 'Ma Société',
-    vatNumber: 'FR12345678901'
+    name: 'Benoît Mbarga',
+    email: 'benoit.mbarga@example.cm',
+    phone: '+237 6 78 90 12 34',
+    address: 'Rue du Marché Central',
+    city: 'Yaoundé',
+    postalCode: '237',
+    country: 'Cameroun',
+    company: 'Entreprise Camerounaise S.A.',
+    vatNumber: 'CM123456789' // Numéro fictif adapté au format local
   })
+  
 
   const toast = (options: {title: string, description: string}) => {
     alert(`${options.title}: ${options.description}`)
@@ -238,7 +239,7 @@ export default function SettingsBilling() {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'EUR'
+      currency: 'XAF'
     }).format(price)
   }
 
@@ -355,7 +356,7 @@ export default function SettingsBilling() {
             <p className="text-gray-600 mt-1">Plan Gratuit - Jusqu'à 5 projets</p>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold text-gray-900">0 €</div>
+            <div className="text-2xl font-bold text-gray-900">0 FCFA</div>
             <div className="text-sm text-gray-500">par mois</div>
           </div>
         </div>
@@ -622,7 +623,7 @@ export default function SettingsBilling() {
 
 
 
-{/* Add Payment Method Modal */}
+      {/* Add Payment Method Modal */}
       {showAddPaymentModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
@@ -869,11 +870,16 @@ export default function SettingsBilling() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     required
                   >
-                    <option value="France">France</option>
-                    <option value="Belgique">Belgique</option>
-                    <option value="Suisse">Suisse</option>
-                    <option value="Canada">Canada</option>
-                    <option value="Luxembourg">Luxembourg</option>
+                    <option value="Cameroun">Cameroun</option>
+                    <option value="Côte d'Ivoire">Côte d'Ivoire</option>
+                    <option value="Sénégal">Sénégal</option>
+                    <option value="République Démocratique du Congo">République Démocratique du Congo</option>
+                    <option value="Gabon">Gabon</option>
+                    <option value="Togo">Togo</option>
+                    <option value="Bénin">Bénin</option>
+                    <option value="Burkina Faso">Burkina Faso</option>
+                    <option value="Mali">Mali</option>
+                    <option value="Niger">Niger</option>
                   </select>
                 </div>
               </div>

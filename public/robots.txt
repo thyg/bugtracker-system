@@ -1,0 +1,14 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /admin
+Disallow: /api
+
+# Host
+Host: https://votre-site.com
+
+# Sitemaps
+Sitemap: https://votre-site.com/sitemap.xml
+Sitemap: https://www.votre-bug-tracker.com/sitemap.xml

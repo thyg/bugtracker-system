@@ -50,7 +50,7 @@ export function HeroSection() {
             <div className="relative bg-card rounded-lg border border-border shadow-2xl overflow-hidden">
               <div className="aspect-video bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
                 <Image
-                  src="/placeholder.svg?height=600&width=1200"
+                  src="/home.png"
                   alt="Tableau de bord BUG-TRACKER"
                   width={1200}
                   height={600}
