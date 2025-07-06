@@ -104,7 +104,3 @@ Debugger attached.
    ○ https://votre-site.com/sitemap-0.xml
 
 
-Waiting for the debugger to disconnect...
-Waiting for the debugger to disconnect...
-PS E:\Range\Nouveau dossier\Bug-tracker>
-

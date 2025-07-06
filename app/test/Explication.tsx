@@ -14,6 +14,8 @@ import apiClient from "@/lib/api"; //
 // cette ligne car c'est elle qui contient l'adresse IP globale
 
 
+
+
 // 3. ici c'est l'import de toast pour afficher des messages
 //  style quand il y a un evenement 
 import { toast } from "sonner";
@@ -43,12 +45,12 @@ const loginMutation = useMutation({
 
 //  5.  ici voila un autre exemple d'utilsation reel
 
-
-const createAssureMutation = useMutation({
-    mutationFn: (newAssure) => apiClient.post('/api/assures', newAssure).then(res => res.data),
+import apiClient from "@/lib/api"; // 
+const createBugMutation = bugMutation({
+    mutationFn: (newBug) => apiClient.post('/api/bugs', newBug).then(res => res.data),
     onSuccess: () => {
-        toast.success("Assuré créé avec succès !");
-        queryClient.invalidateQueries({ queryKey: ['assures'] });
+        toast.success("Bug créé avec succès !");
+        queryClient.invalidateQueries({ queryKey: ['bugs'] });
         setIsModalOpen(false);
     },
     onError: (err) => {

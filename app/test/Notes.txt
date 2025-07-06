@@ -218,10 +218,6 @@ import Image from 'next/image'
 
 
 
-
-
-
-
 ÉTAPE 5 : Implémentation de getStaticProps
 1. Dans vos pages existantes, ajoutez getStaticProps :
 jsx// pages/destinations.js (exemple)
@@ -261,6 +257,7 @@ export async function getStaticProps() {
     }
   }
 }
+
 2. Pour les pages dynamiques, utilisez getStaticPaths :
 jsx// pages/destination/[slug].js
 export async function getStaticPaths() {
@@ -296,7 +293,8 @@ export async function getStaticProps({ params }) {
 🎯 Prochaines étapes SEO
 1. Appliquer le SEO aux autres pages importantes
 Exemple pour app/dashboard/layout.tsx :
-tsximport { generateSEOMetadata } from "@/components/SEO"
+
+import { generateSEOMetadata } from "@/components/SEO"
 
 export const metadata = generateSEOMetadata({
   title: "Dashboard",
@@ -309,7 +307,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 }
 2. Optimiser les pages dynamiques
 Pour app/issues/[id]/page.tsx :
-tsximport { generateSEOMetadata } from "@/components/SEO"
+
+import { generateSEOMetadata } from "@/components/SEO"
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   // Récupérer les données du bug
@@ -328,4 +327,4 @@ og-default.jpg (1200x630px)
 og-dashboard.jpg
 og-pricing.jpg
 
-🚀 Test final
+🚀

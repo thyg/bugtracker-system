@@ -16,7 +16,7 @@ export function Header() {
     { name: t("nav.product"), href: "/product", hasDropdown: true },
     { name: t("nav.pricing"), href: "/pricing" },
     { name: t("nav.docs"), href: "/docs" },
-    { name: t("nav.sandbox"), href: "/sandbox" },
+    //{ name: t("nav.sandbox"), href: "/sandbox" },
   ]
 
   return (

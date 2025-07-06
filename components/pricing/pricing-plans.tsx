@@ -13,18 +13,18 @@ interface PricingPlansProps {
 export function PricingPlans({ billingCycle }: PricingPlansProps) {
   const plans = [
     {
-      name: "Developer",
+      name: "Etudiants",
       price: { monthly: 0, annual: 0 },
-      description: "For solo devs working on small projects",
+      description: "Pour les etudiants",
       features: ["One user", "Error Monitoring and Tracing", "Alerts and notifications via email"],
       cta: "Start trial",
       popular: false,
       variant: "outline" as const,
     },
     {
-      name: "Team",
+      name: "Equipes",
       price: { monthly: 26, annual: 21 },
-      description: "For growing teams that collaborate",
+      description: "Pour les equipes",
       features: [
         "Developer features +",
         "Unlimited users",
@@ -38,9 +38,9 @@ export function PricingPlans({ billingCycle }: PricingPlansProps) {
       variant: "default" as const,
     },
     {
-      name: "Business",
+      name: "Professionnels",
       price: { monthly: 80, annual: 64 },
-      description: "For multiple teams that operate at scale",
+      description: "Pour les professionnels",
       features: [
         "Team features +",
         "Insights (90 day lookback)",
@@ -53,9 +53,9 @@ export function PricingPlans({ billingCycle }: PricingPlansProps) {
       variant: "outline" as const,
     },
     {
-      name: "Enterprise",
+      name: "Entreprices",
       price: { monthly: "Custom", annual: "Custom" },
-      description: "For organizations with advanced needs",
+      description: "Pour les entreprises",
       features: ["Business features +", "Technical Account Manager", "Dedicated customer support"],
       cta: "Contact sales",
       popular: false,
@@ -92,7 +92,7 @@ export function PricingPlans({ billingCycle }: PricingPlansProps) {
                     <div className="flex items-baseline justify-center">
                       {typeof plan.price[billingCycle] === "number" ? (
                         <>
-                          <span className="text-4xl font-bold">${plan.price[billingCycle]}</span>
+                          <span className="text-4xl font-bold">{plan.price[billingCycle]} FCFA</span>
                           <span className="text-muted-foreground ml-1">
                             /{billingCycle === "monthly" ? "mo" : "yr"}
                           </span>
@@ -103,7 +103,7 @@ export function PricingPlans({ billingCycle }: PricingPlansProps) {
                     </div>
                     {billingCycle === "annual" && typeof plan.price.monthly === "number" && plan.price.monthly > 0 && (
                       <div className="text-sm text-muted-foreground mt-1">
-                        ${Math.round(plan.price.annual * 12)} billed annually
+                        {Math.round(plan.price.annual * 12)} FCFA billed annually
                       </div>
                     )}
                   </div>

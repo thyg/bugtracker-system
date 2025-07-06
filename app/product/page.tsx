@@ -196,6 +196,9 @@ export default function ProductPage() {
                       <Card className="overflow-hidden">
                         <CardContent className="p-0">
                           <div className="aspect-video bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
+                          {/** a ce niveu, change les placeholder par les vraies images
+                           * en les integrant directement dans "productFeatures" et ${feature.images}
+                            */}
                             <Image
                               src="/placeholder.svg?height=400&width=600"
                               alt={`Interface ${feature.title}`}
