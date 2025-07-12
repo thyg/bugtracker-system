@@ -24,3 +24,12 @@ hs_err_pid*
 replay_pid*
 # ou seulement celui du front end s’il est rangé dans un sous-dossier
 frontend/node_modules/
+
+
+.next/
+frontend/.next/
+frontend/out/
+
+
+.env*
+frontend/.env*
