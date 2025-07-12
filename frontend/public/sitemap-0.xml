@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+<url><loc>https://votre-site.com/contact</loc><lastmod>2025-07-01T14:04:48.459Z</lastmod><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://votre-site.com/demo</loc><lastmod>2025-07-01T14:04:48.460Z</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://votre-site.com/docs</loc><lastmod>2025-07-01T14:04:48.460Z</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://votre-site.com/pricing</loc><lastmod>2025-07-01T14:04:48.460Z</lastmod><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://votre-site.com/test</loc><lastmod>2025-07-01T14:04:48.460Z</lastmod><changefreq>daily</changefreq><priority>0.5</priority></url>
+<url><loc>https://votre-site.com/product</loc><lastmod>2025-07-01T14:04:48.460Z</lastmod><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://votre-site.com</loc><lastmod>2025-07-01T14:04:48.460Z</lastmod><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://votre-site.com/Facturation</loc><lastmod>2025-07-01T14:04:48.461Z</lastmod><changefreq>daily</changefreq><priority>0.5</priority></url>
+<url><loc>https://votre-site.com/Integrations</loc><lastmod>2025-07-01T14:04:48.461Z</lastmod><changefreq>daily</changefreq><priority>0.5</priority></url>
+<url><loc>https://votre-site.com/assistant</loc><lastmod>2025-07-01T14:04:48.461Z</lastmod><changefreq>daily</changefreq><priority>0.5</priority></url>
+<url><loc>https://votre-site.com/alertes</loc><lastmod>2025-07-01T14:04:48.461Z</lastmod><changefreq>daily</changefreq><priority>0.5</priority></url>
+<url><loc>https://votre-site.com/help</loc><lastmod>2025-07-01T14:04:48.461Z</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://votre-site.com/abonnement</loc><lastmod>2025-07-01T14:04:48.461Z</lastmod><changefreq>daily</changefreq><priority>0.5</priority></url>
+<url><loc>https://votre-site.com/dashboard</loc><lastmod>2025-07-01T14:04:48.461Z</lastmod><changefreq>daily</changefreq><priority>0.5</priority></url>
+<url><loc>https://votre-site.com/issues</loc><lastmod>2025-07-01T14:04:48.462Z</lastmod><changefreq>daily</changefreq><priority>0.5</priority></url>
+<url><loc>https://votre-site.com/performance</loc><lastmod>2025-07-01T14:04:48.462Z</lastmod><changefreq>daily</changefreq><priority>0.5</priority></url>
+<url><loc>https://votre-site.com/library</loc><lastmod>2025-07-01T14:04:48.462Z</lastmod><changefreq>daily</changefreq><priority>0.5</priority></url>
+<url><loc>https://votre-site.com/platforms</loc><lastmod>2025-07-01T14:04:48.462Z</lastmod><changefreq>daily</changefreq><priority>0.5</priority></url>
+<url><loc>https://votre-site.com/projects</loc><lastmod>2025-07-01T14:04:48.462Z</lastmod><changefreq>daily</changefreq><priority>0.5</priority></url>
+<url><loc>https://votre-site.com/questions</loc><lastmod>2025-07-01T14:04:48.462Z</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://votre-site.com/reports</loc><lastmod>2025-07-01T14:04:48.462Z</lastmod><changefreq>daily</changefreq><priority>0.5</priority></url>
+<url><loc>https://votre-site.com/settings</loc><lastmod>2025-07-01T14:04:48.462Z</lastmod><changefreq>daily</changefreq><priority>0.5</priority></url>
+<url><loc>https://votre-site.com/stats</loc><lastmod>2025-07-01T14:04:48.462Z</lastmod><changefreq>daily</changefreq><priority>0.5</priority></url>
+<url><loc>https://votre-site.com/team</loc><lastmod>2025-07-01T14:04:48.462Z</lastmod><changefreq>daily</changefreq><priority>0.5</priority></url>
+<url><loc>https://votre-site.com/update</loc><lastmod>2025-07-01T14:04:48.462Z</lastmod><changefreq>daily</changefreq><priority>0.5</priority></url>
+<url><loc>https://votre-site.com/versions</loc><lastmod>2025-07-01T14:04:48.462Z</lastmod><changefreq>daily</changefreq><priority>0.5</priority></url>
+<url><loc>https://votre-site.com/login</loc><lastmod>2025-07-01T14:04:48.462Z</lastmod><changefreq>daily</changefreq><priority>0.5</priority></url>
+<url><loc>https://votre-site.com/register</loc><lastmod>2025-07-01T14:04:48.462Z</lastmod><changefreq>daily</changefreq><priority>0.5</priority></url>
+</urlset>

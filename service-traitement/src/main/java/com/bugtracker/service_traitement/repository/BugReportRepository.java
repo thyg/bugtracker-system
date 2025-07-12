@@ -1,11 +1,14 @@
-// src/main/java/com/bugtracker/service_traitement/repository/BugReportRepository.java
 package com.bugtracker.service_traitement.repository;
 
 import com.bugtracker.service_traitement.model.BugReportEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface BugReportRepository extends JpaRepository<BugReportEntity, Long> {
-    // Spring Data JPA va automatiquement nous fournir les méthodes comme save(), findById(), findAll(), etc.
+public interface BugReportRepository extends ReactiveCrudRepository<BugReportEntity, Long> {
+    // Spring Data R2DBC va automatiquement nous fournir les méthodes réactives :
+    // - save(entity) -> retourne Mono<BugReportEntity>
+    // - findById(id) -> retourne Mono<BugReportEntity>
+    // - findAll()    -> retourne Flux<BugReportEntity>
+    // - etc.
 }

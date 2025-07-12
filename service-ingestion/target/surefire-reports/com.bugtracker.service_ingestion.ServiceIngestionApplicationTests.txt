@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.bugtracker.service_ingestion.ServiceIngestionApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.363 s -- in com.bugtracker.service_ingestion.ServiceIngestionApplicationTests
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.537 s -- in com.bugtracker.service_ingestion.ServiceIngestionApplicationTests

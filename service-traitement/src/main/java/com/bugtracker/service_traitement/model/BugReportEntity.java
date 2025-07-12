@@ -1,52 +1,77 @@
-// src/main/java/com/bugtracker/service_traitement/model/BugReportEntity.java
-package com.bugtracker.service_traitement.model;
+/*package com.bugtracker.service_traitement.model;
 
-import io.hypersistence.utils.hibernate.type.json.JsonType;
-import jakarta.persistence.*;
-import org.hibernate.annotations.Type;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+//import io.r2dbc.postgresql.codec.Json;
 
-import lombok.Getter;   // <-- Importez
-import lombok.Setter;   // <-- Importez
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
-import java.util.Map;
 
+@Getter
+@Setter
+@Table("bugs") // Annotation Spring Data R2DBC pour le nom de la table.
+public class BugReportEntity {
 
-@Getter // <-- AJOUTEZ CETTE ANNOTATION
-@Setter // <-- AJOUTEZ CETTE ANNOTATION
-@Entity
-@Table(name = "bugs") // Nom de la table dans PostgreSQL
+    @Id // Annotation Spring Data pour la clé primaire.
+    private Long id;
+
+    // Il est recommandé de spécifier explicitement le nom de la colonne.
+    @Column("project_key")
+    private String projectKey;
+
+    @Column("level")
+    private String level;
+
+    @Column("message")
+    private String message;
+
+    // --- CHANGEMENT MAJEUR ---
+    // On utilise le type Json de R2DBC PostgreSQL pour les colonnes JSONB
+    @Column("exception")
+    private String exception; // Changé de String vers Json
+
+    @Column("contexts")
+    private String contexts; // Changé de String vers Json
+
+    @Column("tags")
+    private String tags; // Changé de String vers Json
+    
+    @Column("event_timestamp")
+    private Instant eventTimestamp;
+
+    @Column("received_at")
+    private Instant receivedAt;
+
+    // Plus besoin d'écrire les getters/setters manuellement grâce à Lombok.
+}*/
+
+package com.bugtracker.service_traitement.model;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
+import lombok.Data; // Utilise @Data pour générer getters, setters, toString, etc.
+
+import java.time.Instant;
+
+@Data // Raccourci Lombok pour @Getter, @Setter, @ToString, @EqualsAndHashCode
+@Table("bugs")
 public class BugReportEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String projectKey;
-
-    @Column(nullable = false)
     private String level;
-
     private String message;
 
-    @Type(JsonType.class)
-    @Column(columnDefinition = "jsonb")
-    private Map<String, Object> exception;
-
-    @Type(JsonType.class)
-    @Column(columnDefinition = "jsonb")
-    private Map<String, Object> contexts;
-
-    @Type(JsonType.class)
-    @Column(columnDefinition = "jsonb")
-    private Map<String, Object> tags;
+    // On mappe les colonnes JSONB en tant que simples String en Java
+    private String exception;
+    private String contexts;
+    private String tags;
     
     private Instant eventTimestamp;
-
-    @Column(nullable = false)
     private Instant receivedAt;
-
-    // Getters et Setters (générez-les ou utilisez Lombok)
-    // ...
 }

@@ -1,0 +1,110 @@
+
+PS E:\Range\Nouveau dossier\Bug-tracker> npm run build
+Debugger attached.
+
+> my-v0-project@0.1.0 build
+> next build
+
+Debugger attached.
+   ▲ Next.js 15.2.4
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+Debugger attached.
+Debugger attached.
+Debugger attached.
+ ✓ Compiled successfully
+   Skipping validation of types
+   Skipping linting
+Debugger attached.
+   Collecting page data  ..Debugger attached.
+   Collecting page data  ...Debugger attached.
+   Collecting page data  .Debugger attached.
+ ✓ Collecting page data    
+Debugger attached.
+Debugger attached.
+Debugger attached.
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ✓ Generating static pages (34/34)
+ ✓ Collecting build traces    
+ ✓ Finalizing page optimization
+
+Route (app)                                 Size  First Load JS    
+┌ ○ /                                    4.05 kB         190 kB
+├ ○ /_not-found                            990 B         102 kB
+├ ○ /abonnement                          8.95 kB         238 kB
+├ ○ /alertes                             7.29 kB         131 kB
+├ ○ /assistant                           8.94 kB         110 kB
+├ ○ /contact                             11.9 kB         176 kB
+├ ○ /dashboard                           7.81 kB         224 kB
+├ ○ /demo                                10.3 kB         122 kB
+├ ○ /docs                                6.17 kB         153 kB
+├ ○ /Facturation                         7.42 kB         109 kB
+├ ○ /forgot-password                     3.87 kB         124 kB
+├ ○ /help                                 4.7 kB         116 kB
+├ ○ /Integrations                        6.17 kB         107 kB
+├ ○ /issues                              7.86 kB         141 kB
+├ ƒ /issues/[id]                         9.26 kB         122 kB
+├ ○ /library                             5.85 kB         107 kB
+├ ○ /login                               7.95 kB         150 kB
+├ ○ /logout                                 7 kB         141 kB
+├ ○ /performance                         4.63 kB         211 kB
+├ ○ /platforms                           4.92 kB         149 kB
+├ ƒ /platforms/[plateforme]              8.04 kB         157 kB
+├ ○ /pricing                             15.8 kB         205 kB
+├ ○ /product                             5.22 kB         194 kB
+├ ○ /projects                            10.2 kB         146 kB
+├ ƒ /projects/[id]                       11.6 kB         275 kB
+├ ○ /questions                           4.68 kB         129 kB
+├ ○ /register                            11.7 kB         154 kB
+├ ○ /reports                             9.09 kB         110 kB
+├ ○ /settings                            11.4 kB         155 kB
+├ ○ /stats                                5.3 kB         226 kB
+├ ○ /team                                5.18 kB         106 kB
+├ ○ /test                                4.97 kB         106 kB
+├ ƒ /test/profile                          159 B         101 kB
+├ ○ /update                              4.67 kB         106 kB
+└ ○ /versions                            3.96 kB         105 kB
++ First Load JS shared by all             101 kB
+  ├ chunks/1684-fb1ba997737139d9.js      45.8 kB
+  ├ chunks/4bd1b696-415f7c7672dbb9c9.js  53.3 kB
+  └ other shared chunks (total)          2.04 kB
+
+
+ƒ Middleware                             32.6 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+Waiting for the debugger to disconnect...
+
+> my-v0-project@0.1.0 postbuild
+> next-sitemap
+
+Debugger attached.
+✨ [next-sitemap] Loading next-sitemap config: file:///E:/Range/Nouveau%20dossier/Bug-tracker/next-sitemap.config.js
+✅ [next-sitemap] Generation completed
+┌───────────────┬────────┐
+│ (index)       │ Values │
+├───────────────┼────────┤
+│ indexSitemaps │ 1      │
+│ sitemaps      │ 1      │
+└───────────────┴────────┘
+-----------------------------------------------------
+ SITEMAP INDICES
+-----------------------------------------------------
+
+   ○ https://votre-site.com/sitemap.xml
+
+
+-----------------------------------------------------
+ SITEMAPS
+-----------------------------------------------------
+
+   ○ https://votre-site.com/sitemap-0.xml
+
+
+Waiting for the debugger to disconnect...
+Waiting for the debugger to disconnect...
+PS E:\Range\Nouveau dossier\Bug-tracker>
+

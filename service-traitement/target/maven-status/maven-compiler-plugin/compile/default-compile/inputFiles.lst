@@ -1,2 +1,6 @@
 /home/jude/Documents/Bug tracker/bugtracker-system/service-traitement/src/main/java/com/bugtracker/service_traitement/ServiceTraitementApplication.java
-/home/jude/Documents/Bug tracker/bugtracker-system/service-traitement/src/main/java/com/bugtracker/service_traitement/controller/TestController.java
+/home/jude/Documents/Bug tracker/bugtracker-system/service-traitement/src/main/java/com/bugtracker/service_traitement/config/WebConfig.java
+/home/jude/Documents/Bug tracker/bugtracker-system/service-traitement/src/main/java/com/bugtracker/service_traitement/controller/BugReportController.java
+/home/jude/Documents/Bug tracker/bugtracker-system/service-traitement/src/main/java/com/bugtracker/service_traitement/model/BugReportEntity.java
+/home/jude/Documents/Bug tracker/bugtracker-system/service-traitement/src/main/java/com/bugtracker/service_traitement/repository/BugReportRepository.java
+/home/jude/Documents/Bug tracker/bugtracker-system/service-traitement/src/main/java/com/bugtracker/service_traitement/service/BugConsumerService.java

@@ -1,0 +1,331 @@
+import {
+  RefreshCw,
+  Inbox,
+  Code,
+  Zap,
+  Filter,
+  TrendingUp,
+  Play,
+  PackagePlus,
+  Megaphone,
+  Clock,
+  AlertCircle,
+  Hammer,
+  Layout,
+  Archive,
+  BarChart2,
+} from "lucide-react";
+
+const sidebarItems = [
+  {
+    title: "Actualiser",
+    href: "/refresh",
+    icon: <RefreshCw />,
+  },
+  {
+    title: "Boîte de réception",
+    href: "/inbox",
+    icon: <Inbox />,
+  },
+  {
+    title: "Dépôts",
+    href: "/code",
+    icon: <Code />,
+  },
+  {
+    title: "Pipeline",
+    href: "/pipeline",
+    icon: <Zap />,
+  },
+  {
+    title: "Filtres",
+    href: "/filters",
+    icon: <Filter />,
+  },
+  {
+    title: "Analytique",
+    href: "/analytics",
+    icon: <TrendingUp />,
+  },
+  {
+    title: "Exécution",
+    href: "/run",
+    icon: <Play />,
+  },
+  {
+    title: "Intégrations",
+    href: "/integrations",
+    icon: <PackagePlus />,
+  },
+  {
+    title: "Annonces",
+    href: "/annonces",
+    icon: <Megaphone />,
+  },sonne
+  {
+    title: "Historique",
+    href: "/history",
+    icon: <Clock />,
+  },
+  {
+    title: "Alertes",
+    href: "/alerts",
+    icon: <AlertCircle />,
+  },
+  {
+    title: "Actions",
+    href: "/actions",
+    icon: <Hammer />,
+  },
+  {
+    title: "Disposition",
+    href: "/layout",
+    icon: <Layout />,
+  },
+  {
+    title: "Archives",
+    href: "/archives",
+    icon: <Archive />,
+  },
+  {
+    title: "Graphiques",
+    href: "/charts",
+    icon: <BarChart2 />,
+  },
+];
+
+export default sidebarItems;
+
+
+
+
+
+
+
+
+
+
+
+Pour une **page de démonstration (demo)** sur ton **site web de bug tracker**, tu veux impressionner les visiteurs tout en leur montrant les **fonctionnalités clés**, la **valeur ajoutée** et **l'expérience utilisateur** de ton produit.
+
+---
+
+## 🎯 Objectif de la page demo
+
+* Montrer **à quoi ressemble** le bug tracker.
+* Permettre à l’utilisateur d’**essayer rapidement** (sans inscription si possible).
+* Mettre en avant les **points forts** : rapidité, collaboration, assignation, filtres, vue Kanban, etc.
+
+
+* Une animation courte (30s–1min) montrant :
+
+  * Création d’un ticket
+  * Attribution à un développeur
+  * Évolution de statut (To Do → In Progress → Done)
+
+* Interface réelle, sans possibilité de modifier les données.
+* Montre : dashboard, ticket list, vue Kanban, détails du ticket.
+* Permet de créer/modifier des tickets.
+
+### 4. **Capture d’écran interactive (hover/click pour zoom)**
+
+* Affiche des captures cliquables :
+
+  * Vue d’ensemble
+  * Ticket details
+  * Filtres de recherche
+  * Notifications en temps réel
+
+
+
+### 5. **Mises en avant des fonctionnalités**
+
+Présente-les par blocs :
+
+* ✅ Création rapide de tickets
+* 👥 Assignation à des membres
+* 📦 Gestion par projet
+* 🏷️ Tags & priorité
+* 📊 Graphiques et reporting
+
+
+
+* **S’inscrire gratuitement**
+* **Voir les tarifs**
+* **Contacter l’équipe**
+
+* **Animation** : Framer Motion, Lottie pour onboarding
+
+
+
+
+
+
+
+
+
+Étape 3 : Intégration dans vos pages
+Modifiez chaque page existante :
+jsximport SEO from '../components/SEO'
+
+export default function MaPage() {
+  return (
+    <>
+      <SEO 
+        title="Titre de ma page"
+        description="Description de ma page pour le SEO"
+        url="https://monsite.com/ma-page"
+        image="/images/ma-page-og.jpg"
+      />
+      {/* Votre contenu existant */}
+    </>
+  )
+}
+
+
+
+
+
+
+
+
+
+
+
+import Image from 'next/image'
+
+// Avant
+<img src="/photo.jpg" alt="Description" />
+
+// Après
+<Image 
+  src="/photo.jpg" 
+  alt="Description" 
+  width={800} 
+  height={600}
+  priority // Pour les images above-the-fold
+/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ÉTAPE 5 : Implémentation de getStaticProps
+1. Dans vos pages existantes, ajoutez getStaticProps :
+jsx// pages/destinations.js (exemple)
+export default function Destinations({ destinations }) {
+  return (
+    <>
+      <SEO 
+        title="Nos Destinations"
+        description="Découvrez nos destinations de voyage"
+      />
+      <div>
+        {destinations.map(dest => (
+          <div key={dest.id}>{dest.name}</div>
+        ))}
+      </div>
+    </>
+  )
+}
+
+export async function getStaticProps() {
+  try {
+    // Remplacez par votre vraie API
+    const res = await fetch('https://votre-api.com/destinations')
+    const destinations = await res.json()
+
+    return {
+      props: {
+        destinations,
+      },
+      revalidate: 3600, // Régénère toutes les heures
+    }
+  } catch (error) {
+    return {
+      props: {
+        destinations: [],
+      },
+    }
+  }
+}
+2. Pour les pages dynamiques, utilisez getStaticPaths :
+jsx// pages/destination/[slug].js
+export async function getStaticPaths() {
+  const res = await fetch('https://votre-api.com/destinations')
+  const destinations = await res.json()
+
+  const paths = destinations.map((dest) => ({
+    params: { slug: dest.slug },
+  }))
+
+  return { paths, fallback: 'blocking' }
+}
+
+export async function getStaticProps({ params }) {
+  const res = await fetch(`https://votre-api.com/destinations/${params.slug}`)
+  const destination = await res.json()
+
+  return {
+    props: { destination },
+    revalidate: 3600,
+  }
+}
+
+
+
+
+
+
+
+
+
+
+🎯 Prochaines étapes SEO
+1. Appliquer le SEO aux autres pages importantes
+Exemple pour app/dashboard/layout.tsx :
+tsximport { generateSEOMetadata } from "@/components/SEO"
+
+export const metadata = generateSEOMetadata({
+  title: "Dashboard",
+  description: "Tableau de bord de gestion des bugs et projets",
+  url: "/dashboard",
+})
+
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>
+}
+2. Optimiser les pages dynamiques
+Pour app/issues/[id]/page.tsx :
+tsximport { generateSEOMetadata } from "@/components/SEO"
+
+export async function generateMetadata({ params }: { params: { id: string } }) {
+  // Récupérer les données du bug
+  const issue = await getIssue(params.id) // Votre fonction de récupération
+  
+  return generateSEOMetadata({
+    title: `Issue #${params.id}: ${issue?.title || 'Bug Report'}`,
+    description: issue?.description || 'Détails du bug et suivi de résolution',
+    url: `/issues/${params.id}`,
+  })
+}
+3. Créer des images Open Graph
+Créez des images optimisées dans public/images/ :
+
+og-default.jpg (1200x630px)
+og-dashboard.jpg
+og-pricing.jpg
+
+🚀 Test final
