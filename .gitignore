@@ -25,10 +25,10 @@ replay_pid*
 # ou seulement celui du front end s’il est rangé dans un sous-dossier
 frontend/node_modules/
 
-
-# .gitignore
-node_modules/
-dist/
-*.log
-# Dossiers de build Next.js
 .next/
+frontend/.next/
+frontend/out/
+
+
+.env*
+frontend/.env*
